@@ -1,9 +1,41 @@
 const express = require('express');
+const pool = require('./database/connection');
 
 const app = express();
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
-    res.send('Sistema de Estoque funcionando com JavaScript!');
+    res.json({
+        sistema: 'Sistema de Controle de Estoque',
+        mensagem: 'API funcionando!'
+    });
+});
+
+app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        mensagem: 'Servidor funcionando corretamente'
+    });
+});
+
+app.get('/api/database-test', async (req, res) => {
+    try {
+        const resultado = await pool.query('SELECT NOW()');
+
+        res.status(200).json({
+            status: 'OK',
+            mensagem: 'Conexão com o banco de dados funcionando!',
+            dataHoraBanco: resultado.rows[0]
+        });
+    } catch (error) {
+        console.error('Erro ao conectar ao banco:', error);
+
+        res.status(500).json({
+            status: 'ERRO',
+            mensagem: 'Não foi possível conectar ao banco de dados'
+        });
+    }
 });
 
 module.exports = app;
