@@ -1,5 +1,6 @@
 const pool = require('../database/connection');
 const bcrypt = require('bcrypt');
+const { gerarToken } = require('../utils/jwt');
 
 const login = async (req, res) => {
     try {
@@ -53,8 +54,11 @@ const login = async (req, res) => {
             });
         }
 
+        const token = gerarToken(usuario);
+
         res.status(200).json({
             mensagem: 'Login realizado com sucesso',
+            token,
             usuario: {
                 id: usuario.id,
                 nome: usuario.nome,

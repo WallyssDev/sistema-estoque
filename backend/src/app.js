@@ -2,6 +2,8 @@ const express = require('express');
 const pool = require('./database/connection');
 const usuariosRoutes = require('./routes/usuarios.routes');
 const authRoutes = require('./routes/auth.routes');
+const { autenticar } = require('./middlewares/auth.middleware');
+const { autorizar } = require('./middlewares/permissao.middleware');
 
 const app = express();
 
@@ -42,5 +44,17 @@ app.get('/api/database-test', async (req, res) => {
         });
     }
 });
+
+app.get(
+    '/api/teste-protegida',
+    autenticar,
+    autorizar('ADMIN'),
+    (req, res) => {
+        res.status(200).json({
+            mensagem: 'Você está autenticado e possui permissão!',
+            usuario: req.usuario
+        });
+    }
+);
 
 module.exports = app;
