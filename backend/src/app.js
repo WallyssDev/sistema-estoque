@@ -1,12 +1,14 @@
 const express = require('express');
 const pool = require('./database/connection');
 const usuariosRoutes = require('./routes/usuarios.routes');
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.json({
