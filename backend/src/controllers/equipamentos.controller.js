@@ -319,10 +319,93 @@ const desativarEquipamento = async (req, res) => {
     }
 };
 
+const reativarEquipamento = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || isNaN(id)) {
+            return res.status(400).json({
+                mensagem: 'ID do equipamento inválido'
+            });
+        }
+
+        const resultado = await pool.query(
+            `
+            UPDATE equipamentos
+            SET
+                ativo = true,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+              AND ativo = false
+            RETURNING
+                id,
+                codigo,
+                nome,
+                ativo,
+                updated_at
+            `,
+            [id]
+        );
+
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
+                mensagem: 'Equipamento não encontrado ou já está ativo'
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: 'Equipamento reativado com sucesso',
+            equipamento: resultado.rows[0]
+        });
+
+    } catch (error) {
+        console.error('Erro ao reativar equipamento:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno do servidor'
+        });
+    }
+};
+
+const listarEquipamentosInativos = async (req, res) => {
+    try {
+        const resultado = await pool.query(`
+            SELECT
+                id,
+                codigo,
+                nome,
+                fabricante,
+                numero_serie,
+                localizacao,
+                especificacao,
+                status_qualificacao,
+                status_manutencao,
+                conduta_incidente,
+                ativo,
+                created_at,
+                updated_at
+            FROM equipamentos
+            WHERE ativo = false
+            ORDER BY codigo
+        `);
+
+        return res.status(200).json(resultado.rows);
+
+    } catch (error) {
+        console.error('Erro ao listar equipamentos inativos:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno do servidor'
+        });
+    }
+};
+
 module.exports = {
     criarEquipamento,
     listarEquipamentos,
     buscarEquipamentoPorId,
     atualizarEquipamento,
-    desativarEquipamento
+    desativarEquipamento,
+    reativarEquipamento,
+    listarEquipamentosInativos
 };

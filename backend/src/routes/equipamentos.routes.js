@@ -5,7 +5,9 @@ const {
     listarEquipamentos,
     buscarEquipamentoPorId,
     atualizarEquipamento,
-    desativarEquipamento
+    desativarEquipamento,
+    reativarEquipamento,
+    listarEquipamentosInativos
 } = require('../controllers/equipamentos.controller');
 
 const { autenticar } = require('../middlewares/auth.middleware');
@@ -18,6 +20,13 @@ router.get(
     autenticar,
     autorizar('ADMIN', 'EDITOR', 'LEITOR'),
     listarEquipamentos
+);
+
+router.get(
+    '/inativos',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR', 'LEITOR'),
+    listarEquipamentosInativos
 );
 
 router.get(
@@ -46,6 +55,13 @@ router.delete(
     autenticar,
     autorizar('ADMIN'),
     desativarEquipamento
+);
+
+router.patch(
+    '/:id/reativar',
+    autenticar,
+    autorizar('ADMIN'),
+    reativarEquipamento
 );
 
 module.exports = router;
