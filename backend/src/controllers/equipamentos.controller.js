@@ -271,9 +271,58 @@ const atualizarEquipamento = async (req, res) => {
     }
 };
 
+const desativarEquipamento = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || isNaN(id)) {
+            return res.status(400).json({
+                mensagem: 'ID do equipamento inválido'
+            });
+        }
+
+        const resultado = await pool.query(
+            `
+            UPDATE equipamentos
+            SET
+                ativo = false,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+              AND ativo = true
+            RETURNING
+                id,
+                codigo,
+                nome,
+                ativo,
+                updated_at
+            `,
+            [id]
+        );
+
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
+                mensagem: 'Equipamento não encontrado ou já está desativado'
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: 'Equipamento desativado com sucesso',
+            equipamento: resultado.rows[0]
+        });
+
+    } catch (error) {
+        console.error('Erro ao desativar equipamento:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno do servidor'
+        });
+    }
+};
+
 module.exports = {
     criarEquipamento,
     listarEquipamentos,
     buscarEquipamentoPorId,
-    atualizarEquipamento
+    atualizarEquipamento,
+    desativarEquipamento
 };

@@ -4,7 +4,8 @@ const {
     criarEquipamento,
     listarEquipamentos,
     buscarEquipamentoPorId,
-    atualizarEquipamento
+    atualizarEquipamento,
+    desativarEquipamento
 } = require('../controllers/equipamentos.controller');
 
 const { autenticar } = require('../middlewares/auth.middleware');
@@ -38,6 +39,13 @@ router.put(
     autenticar,
     autorizar('ADMIN', 'EDITOR'),
     atualizarEquipamento
+);
+
+router.delete(
+    '/:id',
+    autenticar,
+    autorizar('ADMIN'),
+    desativarEquipamento
 );
 
 module.exports = router;
