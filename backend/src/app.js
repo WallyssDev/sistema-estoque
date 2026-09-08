@@ -3,6 +3,7 @@ const pool = require('./database/connection');
 const usuariosRoutes = require('./routes/usuarios.routes');
 const authRoutes = require('./routes/auth.routes');
 const equipamentosRoutes = require('./routes/equipamentos.routes');
+const auditoriaRoutes = require('./routes/auditoria.routes');
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/equipamentos', equipamentosRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
 
 app.get('/', (req, res) => {
     res.json({
