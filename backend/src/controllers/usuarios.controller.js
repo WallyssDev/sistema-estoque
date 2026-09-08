@@ -22,7 +22,8 @@ const criarUsuario = async (req, res) => {
             nome,
             email,
             senha,
-            perfil
+            perfil,
+            req.usuario.id
         );
 
         res.status(201).json(usuario);
@@ -74,7 +75,8 @@ const atualizarUsuario = async (req, res) => {
             id,
             nome,
             email,
-            perfil
+            perfil,
+            req.usuario.id
         );
 
         return res.status(200).json(usuario);
@@ -115,7 +117,10 @@ const reativarUsuario = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const usuario = await usuariosService.reativarUsuario(id);
+        const usuario = await usuariosService.reativarUsuario(
+            id,
+            req.usuario.id
+        );
 
         return res.status(200).json({
             mensagem: 'Usuário reativado com sucesso',
