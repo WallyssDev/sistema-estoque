@@ -4,6 +4,7 @@ const usuariosRoutes = require('./routes/usuarios.routes');
 const authRoutes = require('./routes/auth.routes');
 const equipamentosRoutes = require('./routes/equipamentos.routes');
 const auditoriaRoutes = require('./routes/auditoria.routes');
+const manutencoesRoutes = require('./routes/manutencoes.routes');
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/equipamentos', equipamentosRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
+app.use('/api/manutencoes', manutencoesRoutes);
 
 app.get('/', (req, res) => {
     res.json({

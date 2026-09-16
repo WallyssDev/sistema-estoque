@@ -54,3 +54,20 @@ ON SEQUENCE
     equipamentos_id_seq,
     auditoria_id_seq
 TO sistema_estoque_app;
+
+-- ============================================================
+-- Tabela: manutencoes
+-- ============================================================
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE manutencoes
+TO sistema_estoque_app;
+
+
+-- ============================================================
+-- Sequence da tabela manutencoes
+-- ============================================================
+
+GRANT USAGE, SELECT
+ON SEQUENCE manutencoes_id_seq
+TO sistema_estoque_app;
