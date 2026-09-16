@@ -71,3 +71,11 @@ TO sistema_estoque_app;
 GRANT USAGE, SELECT
 ON SEQUENCE manutencoes_id_seq
 TO sistema_estoque_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE qualificacoes
+TO sistema_estoque_app;
+
+GRANT USAGE, SELECT
+ON SEQUENCE qualificacoes_id_seq
+TO sistema_estoque_app;
