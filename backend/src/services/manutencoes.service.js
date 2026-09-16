@@ -158,7 +158,222 @@ const listarManutencoes = async ({ equipamentoId = null } = {}) => {
     return resultado.rows;
 };
 
+const normalizarData = (valor) => {
+    if (valor === null || valor === undefined) {
+        return null;
+    }
+
+    if (valor instanceof Date) {
+        return valor.toISOString().split('T')[0];
+    }
+
+    return String(valor).slice(0, 10);
+};
+
+const atualizarManutencao = async ({
+    manutencaoId,
+    tipo,
+    dataManutencao,
+    proximaManutencao = null,
+    responsavel,
+    descricao,
+    resultado,
+    observacoes = null,
+    usuarioLogadoId
+}) => {
+
+    if (
+        !manutencaoId ||
+        !tipo ||
+        !dataManutencao ||
+        !responsavel ||
+        !descricao ||
+        !resultado
+    ) {
+        throw new Error('Os campos obrigatórios não foram preenchidos');
+    }
+
+    let client;
+
+    try {
+        client = await pool.connect();
+
+        await client.query('BEGIN');
+
+        const consultaAtual = await client.query(
+            `
+            SELECT
+                id,
+                equipamento_id,
+                tipo,
+                data_manutencao,
+                proxima_manutencao,
+                responsavel,
+                descricao,
+                resultado,
+                observacoes,
+                created_at
+            FROM manutencoes
+            WHERE id = $1
+            `,
+            [manutencaoId]
+        );
+
+        if (consultaAtual.rows.length === 0) {
+            throw new Error('Manutenção não encontrada');
+        }
+
+        const manutencaoAtual = consultaAtual.rows[0];
+
+        const novosDados = {
+            tipo,
+            data_manutencao: dataManutencao,
+            proxima_manutencao: proximaManutencao,
+            responsavel,
+            descricao,
+            resultado,
+            observacoes
+        };
+
+        const camposAlterados = [];
+
+        const comparar = (campo, valorAnterior, valorNovo) => {
+            const anterior = valorAnterior === null
+                ? null
+                : String(valorAnterior);
+
+            const novo = valorNovo === null
+                ? null
+                : String(valorNovo);
+
+            if (anterior !== novo) {
+                camposAlterados.push({
+                    campo,
+                    valorAnterior: anterior,
+                    valorNovo: novo
+                });
+            }
+        };
+
+        comparar(
+            'tipo',
+            manutencaoAtual.tipo,
+            novosDados.tipo
+        );
+
+        comparar(
+            'data_manutencao',
+            normalizarData(manutencaoAtual.data_manutencao),
+            normalizarData(novosDados.data_manutencao)
+        );
+
+        comparar(
+            'proxima_manutencao',
+            normalizarData(manutencaoAtual.proxima_manutencao),
+            normalizarData(novosDados.proxima_manutencao)
+        );
+
+        comparar(
+            'responsavel',
+            manutencaoAtual.responsavel,
+            novosDados.responsavel
+        );
+
+        comparar(
+            'descricao',
+            manutencaoAtual.descricao,
+            novosDados.descricao
+        );
+
+        comparar(
+            'resultado',
+            manutencaoAtual.resultado,
+            novosDados.resultado
+        );
+
+        comparar(
+            'observacoes',
+            manutencaoAtual.observacoes,
+            novosDados.observacoes
+        );
+
+        if (camposAlterados.length === 0) {
+            throw new Error('Nenhuma alteração foi realizada');
+        }
+
+        const resultadoAtualizacao = await client.query(
+            `
+            UPDATE manutencoes
+            SET
+                tipo = $1,
+                data_manutencao = $2,
+                proxima_manutencao = $3,
+                responsavel = $4,
+                descricao = $5,
+                resultado = $6,
+                observacoes = $7
+            WHERE id = $8
+            RETURNING
+                id,
+                equipamento_id,
+                tipo,
+                data_manutencao,
+                proxima_manutencao,
+                responsavel,
+                descricao,
+                resultado,
+                observacoes,
+                created_at
+            `,
+            [
+                tipo,
+                dataManutencao,
+                proximaManutencao,
+                responsavel,
+                descricao,
+                resultado,
+                observacoes,
+                manutencaoId
+            ]
+        );
+
+        const manutencaoAtualizada = resultadoAtualizacao.rows[0];
+
+        for (const alteracao of camposAlterados) {
+            await registrarAuditoria({
+                usuarioId: usuarioLogadoId,
+                acao: 'ALTERACAO',
+                entidade: 'MANUTENCAO',
+                registroId: manutencaoId,
+                campo: alteracao.campo,
+                valorAnterior: alteracao.valorAnterior,
+                valorNovo: alteracao.valorNovo,
+                db: client
+            });
+        }
+
+        await client.query('COMMIT');
+
+        return manutencaoAtualizada;
+
+    } catch (error) {
+
+        if (client) {
+            await client.query('ROLLBACK');
+        }
+
+        throw error;
+
+    } finally {
+
+        if (client) {
+            client.release();
+        }
+    }
+};
+
 module.exports = {
     criarManutencao,
-    listarManutencoes
+    listarManutencoes,
+    atualizarManutencao
 };

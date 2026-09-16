@@ -2,7 +2,8 @@ const express = require('express');
 
 const {
     criarManutencao,
-    listarManutencoes
+    listarManutencoes,
+    atualizarManutencao
 } = require('../controllers/manutencoes.controller');
 
 const { autenticar } = require('../middlewares/auth.middleware');
@@ -15,6 +16,13 @@ router.get(
     autenticar,
     autorizar('ADMIN', 'EDITOR', 'LEITOR'),
     listarManutencoes
+);
+
+router.put(
+    '/:id',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR'),
+    atualizarManutencao
 );
 
 router.post(

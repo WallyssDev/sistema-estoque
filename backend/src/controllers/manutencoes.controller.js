@@ -60,7 +60,46 @@ const listarManutencoes = async (req, res) => {
     }
 };
 
+const atualizarManutencao = async (req, res) => {
+    try {
+        const {
+            tipo,
+            data_manutencao,
+            proxima_manutencao,
+            responsavel,
+            descricao,
+            resultado,
+            observacoes
+        } = req.body;
+
+        const manutencao = await manutencoesService.atualizarManutencao({
+            manutencaoId: req.params.id,
+            tipo,
+            dataManutencao: data_manutencao,
+            proximaManutencao: proxima_manutencao,
+            responsavel,
+            descricao,
+            resultado,
+            observacoes,
+            usuarioLogadoId: req.usuario.id
+        });
+
+        return res.status(200).json({
+            mensagem: 'Manutenção atualizada com sucesso',
+            manutencao
+        });
+
+    } catch (error) {
+        console.error('Erro ao atualizar manutenção:', error);
+
+        return res.status(400).json({
+            mensagem: error.message
+        });
+    }
+};
+
 module.exports = {
     criarManutencao,
-    listarManutencoes
+    listarManutencoes,
+    atualizarManutencao
 };
