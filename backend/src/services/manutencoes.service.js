@@ -116,6 +116,49 @@ const criarManutencao = async ({
     }
 };
 
+const listarManutencoes = async ({ equipamentoId = null } = {}) => {
+
+    const valores = [];
+    const filtros = [];
+
+    let consulta = `
+        SELECT
+            m.id,
+            m.equipamento_id,
+            e.codigo AS equipamento_codigo,
+            e.nome AS equipamento_nome,
+            m.tipo,
+            m.data_manutencao,
+            m.proxima_manutencao,
+            m.responsavel,
+            m.descricao,
+            m.resultado,
+            m.observacoes,
+            m.created_at
+        FROM manutencoes m
+        INNER JOIN equipamentos e
+            ON e.id = m.equipamento_id
+    `;
+
+    if (equipamentoId) {
+        valores.push(equipamentoId);
+        filtros.push(`m.equipamento_id = $${valores.length}`);
+    }
+
+    if (filtros.length > 0) {
+        consulta += ` WHERE ${filtros.join(' AND ')}`;
+    }
+
+    consulta += `
+        ORDER BY m.data_manutencao DESC, m.id DESC
+    `;
+
+    const resultado = await pool.query(consulta, valores);
+
+    return resultado.rows;
+};
+
 module.exports = {
-    criarManutencao
+    criarManutencao,
+    listarManutencoes
 };

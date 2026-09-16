@@ -39,6 +39,28 @@ const criarManutencao = async (req, res) => {
     }
 };
 
+const listarManutencoes = async (req, res) => {
+    try {
+        const { equipamento_id } = req.query;
+
+        const manutencoes = await manutencoesService.listarManutencoes({
+            equipamentoId: equipamento_id
+        });
+
+        return res.status(200).json({
+            manutencoes
+        });
+
+    } catch (error) {
+        console.error('Erro ao listar manutenções:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro ao listar manutenções'
+        });
+    }
+};
+
 module.exports = {
-    criarManutencao
+    criarManutencao,
+    listarManutencoes
 };
