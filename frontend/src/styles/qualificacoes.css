@@ -1,0 +1,124 @@
+.qualificacoes-page {
+    width: 100%;
+}
+
+.qualificacoes-title {
+    margin-bottom: 24px;
+}
+
+.qualificacoes-title h2 {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.qualificacoes-title p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.qualificacoes-resumo {
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.qualificacoes-table-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.qualificacoes-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.qualificacoes-table th {
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.qualificacoes-table td {
+    padding: 16px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid #f3f4f6;
+    white-space: nowrap;
+}
+
+.qualificacoes-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.qualificacoes-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.qualificacoes-table td:first-child {
+    font-weight: 600;
+    color: #111827;
+}
+
+.qualificacoes-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nova-qualificacao-button {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.nova-qualificacao-button:hover {
+    background: #1d4ed8;
+}
+
+.qualificacoes-table td:last-child button {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.qualificacoes-table td:last-child button:hover {
+    background: #f3f4f6;
+}
+
+.mensagem-sucesso {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.mensagem-erro {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}

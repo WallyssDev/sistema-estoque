@@ -89,6 +89,23 @@ const criarQualificacao = async ({
 
         const qualificacaoCriada = resultadoQualificacao.rows[0];
 
+        const equipamentoDados = await client.query(
+            `
+    SELECT
+        codigo AS equipamento_codigo,
+        nome AS equipamento_nome
+    FROM equipamentos
+    WHERE id = $1
+    `,
+            [qualificacaoCriada.equipamento_id]
+        );
+
+        qualificacaoCriada.equipamento_codigo =
+            equipamentoDados.rows[0].equipamento_codigo;
+
+        qualificacaoCriada.equipamento_nome =
+            equipamentoDados.rows[0].equipamento_nome;
+
         await registrarAuditoria({
             usuarioId: usuarioLogadoId,
             acao: 'CRIACAO',
