@@ -1,7 +1,8 @@
 const express = require('express');
 
 const {
-    consultarAuditoria
+    consultarAuditoria,
+    consultarUsuariosAuditoria
 } = require('../controllers/auditoria.controller');
 
 const { autenticar } = require('../middlewares/auth.middleware');
@@ -14,6 +15,13 @@ router.get(
     autenticar,
     autorizar('ADMIN', 'EDITOR', 'LEITOR'),
     consultarAuditoria
+);
+
+router.get(
+    '/usuarios',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR', 'LEITOR'),
+    consultarUsuariosAuditoria
 );
 
 module.exports = router;

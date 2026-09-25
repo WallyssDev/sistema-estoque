@@ -9,3 +9,217 @@ body {
     background: #f5f6f8;
     color: #1f2937;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    width: 700px;
+    max-width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal h3 {
+    margin-bottom: 20px;
+}
+
+.modal p {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.modal button {
+    margin-top: 15px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.paginacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.paginacao button {
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.paginacao button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.paginacao span {
+    font-size: 14px;
+    color: #374151;
+}
+
+.filtros-auditoria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 20px 0;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filtro label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filtro input,
+.filtro select {
+    min-width: 150px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 14px;
+}
+
+.botao-limpar-filtros {
+    align-self: flex-end;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #6b7280;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.botao-limpar-filtros:hover {
+    opacity: 0.9;
+}
+
+
+/* Tabela de auditoria */
+
+.auditoria-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.auditoria-tabela {
+    width: 100%;
+    min-width: 1150px;
+    border-collapse: collapse;
+    table-layout: auto;
+    font-size: 14px;
+}
+
+.auditoria-tabela thead {
+    background: #f1f5f9;
+}
+
+.auditoria-tabela th {
+    padding: 15px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.auditoria-tabela td {
+    padding: 14px;
+    color: #374151;
+    line-height: 1.5;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-wrap: anywhere;
+}
+
+.auditoria-tabela tbody tr:hover {
+    background: #f8fafc;
+}
+
+.auditoria-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Evita que identificadores e ações se quebrem */
+
+.auditoria-tabela th:nth-child(3),
+.auditoria-tabela td:nth-child(3),
+.auditoria-tabela th:nth-child(4),
+.auditoria-tabela td:nth-child(4),
+.auditoria-tabela th:nth-child(5),
+.auditoria-tabela td:nth-child(5) {
+    white-space: nowrap;
+}
+
+/* Colunas de valores históricos */
+
+.auditoria-tabela th:nth-child(7),
+.auditoria-tabela td:nth-child(7),
+.auditoria-tabela th:nth-child(8),
+.auditoria-tabela td:nth-child(8) {
+    min-width: 170px;
+    max-width: 260px;
+}
+
+/* Botão Ver detalhes */
+
+.auditoria-botao-detalhes {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 105px;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.auditoria-botao-detalhes:hover {
+    background: #1d4ed8;
+}
+
+.auditoria-botao-detalhes:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}

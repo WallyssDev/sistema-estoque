@@ -144,7 +144,25 @@ const listarAuditoria = async ({
     };
 };
 
+const listarUsuariosAuditoria = async () => {
+
+    const resultado = await pool.query(
+        `
+        SELECT DISTINCT
+            u.id,
+            u.nome
+        FROM auditoria a
+        INNER JOIN usuarios u
+            ON u.id = a.usuario_id
+        ORDER BY u.nome ASC
+        `
+    );
+
+    return resultado.rows;
+};
+
 module.exports = {
     registrarAuditoria,
-    listarAuditoria
+    listarAuditoria,
+    listarUsuariosAuditoria
 };

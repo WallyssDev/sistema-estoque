@@ -1,4 +1,7 @@
-const { listarAuditoria } = require('../services/auditoria.service');
+const {
+    listarAuditoria,
+    listarUsuariosAuditoria
+} = require('../services/auditoria.service');
 
 const consultarAuditoria = async (req, res) => {
 
@@ -60,6 +63,30 @@ const consultarAuditoria = async (req, res) => {
     }
 };
 
+const consultarUsuariosAuditoria = async (req, res) => {
+
+    try {
+
+        const usuarios = await listarUsuariosAuditoria();
+
+        return res.status(200).json({
+            usuarios
+        });
+
+    } catch (error) {
+
+        console.error(
+            'Erro ao consultar usuários da auditoria:',
+            error
+        );
+
+        return res.status(500).json({
+            mensagem: 'Erro interno do servidor'
+        });
+    }
+};
+
 module.exports = {
-    consultarAuditoria
+    consultarAuditoria,
+    consultarUsuariosAuditoria
 };

@@ -18,7 +18,7 @@ function Sidebar() {
                 <NavLink to="/qualificacoes">Qualificações</NavLink>
                 <NavLink to="/operacional">Operacional</NavLink>
                 <NavLink to="/regulatorio">Regulatório</NavLink>
-                <NavLink to="/auditoria">Auditoria</NavLink>
+                <NavLink to="/auditoria">Histórico</NavLink>
                 {usuario?.perfil === 'ADMIN' && (
                     <NavLink to="/usuarios">Usuários</NavLink>
                 )}
