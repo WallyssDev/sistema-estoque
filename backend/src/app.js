@@ -9,6 +9,7 @@ const manutencoesRoutes = require('./routes/manutencoes.routes');
 const qualificacoesRoutes = require('./routes/qualificacoes.routes');
 const operacionaisRoutes = require('./routes/operacionais.routes');
 const regulatoriosRoutes = require('./routes/regulatorios.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/manutencoes', manutencoesRoutes);
 app.use('/api/qualificacoes', qualificacoesRoutes);
 app.use('/api/operacionais', operacionaisRoutes);
 app.use('/api/regulatorios', regulatoriosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
     res.json({

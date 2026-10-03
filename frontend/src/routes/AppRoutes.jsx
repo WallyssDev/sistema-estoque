@@ -12,6 +12,7 @@ import Relatorios from '../pages/Relatorios';
 import Login from '../pages/Login';
 import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
+import EquipamentoDetalhes from '../pages/EquipamentoDetalhes';
 
 function AppRoutes() {
     return (
@@ -105,6 +106,15 @@ function AppRoutes() {
             <Route
                 path="/"
                 element={<Navigate to="/dashboard" replace />}
+            />
+
+            <Route
+                path="/equipamentos/:id"
+                element={
+                    <ProtectedRoute>
+                        <EquipamentoDetalhes />
+                    </ProtectedRoute>
+                }
             />
         </Routes>
     );
