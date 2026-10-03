@@ -223,3 +223,1133 @@ body {
     outline: 3px solid #93c5fd;
     outline-offset: 2px;
 }
+
+/* ================================
+   ALERTAS DO DASHBOARD
+================================ */
+
+.dashboard-alertas {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-alertas-header {
+    margin-bottom: 14px;
+}
+
+.dashboard-alertas-header h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.dashboard-alertas-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.dashboard-alertas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.dashboard-alerta {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.dashboard-alerta-vencida {
+    border-left: 4px solid #dc2626;
+}
+
+.dashboard-alerta-proxima {
+    border-left: 4px solid #f59e0b;
+}
+
+.dashboard-alerta-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.dashboard-alerta-titulo span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.dashboard-alerta-titulo strong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 14px;
+}
+
+.dashboard-alerta-vencida .dashboard-alerta-titulo strong {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.dashboard-alerta-proxima .dashboard-alerta-titulo strong {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.dashboard-alerta-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dashboard-alerta-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.dashboard-alerta-item>div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.dashboard-alerta-item strong {
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.dashboard-alerta-item span {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.dashboard-alerta-item>span {
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.dashboard-alerta>p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ================================
+   ATIVIDADES RECENTES
+================================ */
+
+.dashboard-atividades {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 22px;
+}
+
+.dashboard-atividades-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.dashboard-atividades-header h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.dashboard-atividades-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.dashboard-atividades-lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-atividade {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dashboard-atividade:first-child {
+    padding-top: 0;
+}
+
+.dashboard-atividade:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.dashboard-atividade-indicador {
+    display: flex;
+    justify-content: center;
+    width: 10px;
+    padding-top: 5px;
+}
+
+.dashboard-atividade-indicador span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #2563eb;
+}
+
+.dashboard-atividade-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.dashboard-atividade-conteudo strong {
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.dashboard-atividade-conteudo p {
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
+}
+
+.dashboard-atividade-conteudo > span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.dashboard-atividades-vazio {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Cards clicáveis do Dashboard */
+.dashboard-card {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card span,
+.dashboard-card strong {
+    color: inherit;
+}
+
+/* Alertas clicáveis do Dashboard */
+.dashboard-alerta {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-alerta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-alerta span,
+.dashboard-alerta strong,
+.dashboard-alerta p {
+    color: inherit;
+}
+
+.dashboard-alerta a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.dashboard-alerta a:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* =========================================================
+   DASHBOARD - ATIVIDADES RECENTES
+   ========================================================= */
+
+.dashboard-atividades {
+    margin-top: 24px;
+}
+
+.dashboard-atividades-lista {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+}
+
+.dashboard-atividade-item {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+
+    width: 100%;
+
+    padding: 16px 20px;
+
+    text-decoration: none !important;
+
+    color: inherit !important;
+
+    border-bottom: 1px solid #edf0f4;
+
+    transition:
+        background-color 0.2s ease,
+        padding-left 0.2s ease;
+}
+
+.dashboard-atividade-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard-atividade-item:hover {
+    background-color: #f8f9fc;
+
+    padding-left: 24px;
+
+    text-decoration: none !important;
+}
+
+/* Linha vertical da timeline */
+
+.dashboard-atividade-indicador {
+    position: relative;
+
+    width: 24px;
+
+    min-width: 24px;
+
+    display: flex;
+
+    justify-content: center;
+}
+
+.dashboard-atividade-indicador::before {
+    content: '';
+
+    position: absolute;
+
+    top: 8px;
+
+    bottom: -24px;
+
+    left: 50%;
+
+    width: 1px;
+
+    background-color: #dfe4ec;
+
+    transform: translateX(-50%);
+}
+
+.dashboard-atividade-item:last-child
+.dashboard-atividade-indicador::before {
+    display: none;
+}
+
+/* Ponto da timeline */
+
+.dashboard-atividade-indicador span {
+    position: relative;
+
+    z-index: 2;
+
+    width: 9px;
+
+    height: 9px;
+
+    margin-top: 6px;
+
+    border-radius: 50%;
+
+    background-color: #2563eb;
+
+    box-shadow:
+        0 0 0 4px #eff6ff;
+}
+
+/* Conteúdo */
+
+.dashboard-atividade-conteudo {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    min-width: 0;
+
+    padding-left: 12px;
+}
+
+.dashboard-atividade-conteudo strong {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #172033;
+}
+
+.dashboard-atividade-conteudo span {
+    font-size: 14px;
+
+    line-height: 1.4;
+
+    color: #4b5563;
+}
+
+.dashboard-atividade-conteudo small {
+    font-size: 12px;
+
+    color: #8a94a6;
+}
+
+/* Evita qualquer estilo padrão de link */
+
+.dashboard-atividade-item,
+.dashboard-atividade-item:visited,
+.dashboard-atividade-item:hover,
+.dashboard-atividade-item:active {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+/* =========================================================
+   EQUIPAMENTOS - LINHAS CLICÁVEIS
+   ========================================================= */
+
+.dashboard-table-row-clickable {
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+.dashboard-table-row-clickable:hover {
+    background-color: #f8f9fc;
+}
+
+.dashboard-table-row-clickable a {
+    color: #520167;
+
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+.dashboard-table-row-clickable a:hover {
+    text-decoration: underline;
+}
+
+.dashboard-table a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.dashboard-table a:hover {
+    text-decoration: none;
+}
+
+/* =========================================
+   DETALHES DO EQUIPAMENTO
+   ========================================= */
+
+.equipamento-detalhes {
+    width: 100%;
+}
+
+.equipamento-voltar {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 20px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #5b21b6;
+
+    cursor: pointer;
+}
+
+.equipamento-voltar:hover {
+    text-decoration: underline;
+}
+
+.equipamento-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    padding: 24px 28px;
+    margin-bottom: 24px;
+
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.equipamento-header-codigo {
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #5b21b6;
+
+    background: #f3e8ff;
+
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.equipamento-header h1 {
+    margin: 0 0 6px;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.equipamento-header p {
+    margin: 0;
+
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.equipamento-header-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.status-badge-sucesso {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge-atencao {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge-erro {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =========================================
+   IDENTIFICAÇÃO DO EQUIPAMENTO
+   ========================================= */
+
+.equipamento-secao {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.equipamento-secao-titulo {
+    margin-bottom: 24px;
+}
+
+.equipamento-secao-titulo h2 {
+    margin: 0 0 4px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.equipamento-secao-titulo p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.equipamento-identificacao-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px 32px;
+}
+
+.equipamento-info-item {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    min-width: 0;
+}
+
+.equipamento-info-item span {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #6b7280;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.equipamento-info-item strong {
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #111827;
+
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+.equipamento-info-item-largo {
+    grid-column: 1 / -1;
+}
+
+/* =========================================
+   QUALIFICAÇÕES DO EQUIPAMENTO
+   ========================================= */
+
+.equipamento-qualificacoes {
+    margin-top: 24px;
+}
+
+.equipamento-qualificacoes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.equipamento-qualificacao-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.equipamento-qualificacao-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.equipamento-info-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    color: #6b7280;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.equipamento-qualificacao-cabecalho h3 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.qualificacao-resultado {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    background: #f3f4f6;
+    color: #374151;
+
+    white-space: nowrap;
+}
+
+.equipamento-qualificacao-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 18px 24px;
+}
+
+@media (max-width: 900px) {
+
+    .equipamento-qualificacoes-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .equipamento-qualificacao-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .equipamento-qualificacao-cabecalho {
+        flex-direction: column;
+    }
+
+}
+
+/* =========================================
+   MANUTENÇÕES DO EQUIPAMENTO
+   ========================================= */
+
+.equipamento-manutencoes {
+    margin-top: 24px;
+}
+
+.equipamento-manutencoes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.equipamento-manutencao-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.equipamento-manutencao-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.equipamento-manutencao-cabecalho h3 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.manutencao-resultado {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    background: #f3f4f6;
+    color: #374151;
+
+    white-space: nowrap;
+}
+
+.equipamento-manutencao-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 18px 24px;
+}
+
+@media (max-width: 900px) {
+
+    .equipamento-manutencoes-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .equipamento-manutencao-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .equipamento-manutencao-cabecalho {
+        flex-direction: column;
+    }
+
+}
+
+/* ================================
+   OPERACIONAL E REGULATÓRIO
+================================ */
+
+.equipamento-operacional-regulatorio {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.equipamento-operacional-regulatorio .equipamento-secao {
+    margin-bottom: 0;
+}
+
+.equipamento-operacional-grid,
+.equipamento-regulatorio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 24px;
+}
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+
+@media (max-width: 1100px) {
+
+    .equipamento-operacional-regulatorio {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .equipamento-operacional-grid,
+    .equipamento-regulatorio-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ================================
+   CORES DOS RESULTADOS
+================================ */
+
+.qualificacao-resultado.status-badge-sucesso,
+.manutencao-resultado.status-badge-sucesso {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.qualificacao-resultado.status-badge-atencao,
+.manutencao-resultado.status-badge-atencao {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.qualificacao-resultado.status-badge-erro,
+.manutencao-resultado.status-badge-erro {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ================================
+   STATUS DE PRAZO
+================================ */
+
+.prazo-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.prazo-em-dia {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.prazo-atencao {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.prazo-vencido {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =========================================================
+   DASHBOARD - ALERTAS E VENCIMENTOS
+   ========================================================= */
+
+.dashboard-alerta-lista {
+    max-height: 260px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 6px 4px 2px;
+}
+
+
+/* Barra de rolagem */
+
+.dashboard-alerta-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-alerta-lista::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dashboard-alerta-lista::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dashboard-alerta-lista::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* Item individual do equipamento */
+
+.dashboard-alerta-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    width: 100%;
+
+    padding: 12px 14px;
+    margin-bottom: 8px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+
+/* Remove margem do último equipamento */
+
+.dashboard-alerta-item:last-child {
+    margin-bottom: 2px;
+}
+
+
+/* Hover do equipamento */
+
+.dashboard-alerta-item:hover {
+    transform: translateY(-2px);
+
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Área com código + nome */
+
+.dashboard-alerta-equipamento {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    gap: 3px;
+}
+
+
+/* Código do equipamento */
+
+.dashboard-alerta-equipamento strong {
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #334155;
+
+    white-space: nowrap;
+}
+
+
+/* Nome do equipamento */
+
+.dashboard-alerta-equipamento span {
+    font-size: 13px;
+
+    color: #64748b;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Área da data + seta */
+
+.dashboard-alerta-data {
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+
+    gap: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #64748b;
+}
+
+
+/* Seta */
+
+.dashboard-alerta-seta {
+    font-size: 17px;
+    font-weight: 600;
+
+    color: #94a3b8;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+/* Movimento da seta no hover */
+
+.dashboard-alerta-item:hover .dashboard-alerta-seta {
+    transform: translateX(3px);
+
+    color: #475569;
+}
+
+
+/* Estado vazio */
+
+.dashboard-alerta-vazio {
+    padding: 16px 8px;
+
+    margin: 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* Mantém os cards de alerta organizados */
+
+.dashboard-alerta {
+    min-width: 0;
+    overflow: hidden;
+}
+
+
+/* Ajuste para telas menores */
+
+@media (max-width: 768px) {
+
+    .dashboard-alerta-lista {
+        max-height: 240px;
+    }
+
+    .dashboard-alerta-item {
+        padding: 11px 12px;
+
+        gap: 10px;
+    }
+
+    .dashboard-alerta-equipamento span {
+        max-width: 180px;
+    }
+
+}
