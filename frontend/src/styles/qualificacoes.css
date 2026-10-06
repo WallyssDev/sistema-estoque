@@ -1,54 +1,100 @@
+/* =========================================================
+   QUALIFICAÇÕES
+   ========================================================= */
+
 .qualificacoes-page {
     width: 100%;
+    min-width: 0;
 }
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
 
 .qualificacoes-title {
     margin-bottom: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
 }
 
 .qualificacoes-title h2 {
     font-size: 24px;
+
     margin-bottom: 6px;
 }
 
 .qualificacoes-title p {
     font-size: 14px;
+
     color: #6b7280;
 }
+
+/* =========================================================
+   RESUMO
+   ========================================================= */
 
 .qualificacoes-resumo {
     margin-bottom: 20px;
+
     font-size: 13px;
+
     color: #6b7280;
 }
 
+/* =========================================================
+   TABELA
+   ========================================================= */
+
 .qualificacoes-table-container {
+    width: 100%;
+
     background: #ffffff;
+
     border: 1px solid #e5e7eb;
+
     border-radius: 10px;
+
     overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 .qualificacoes-table {
     width: 100%;
+
     border-collapse: collapse;
 }
 
 .qualificacoes-table th {
     background: #f9fafb;
+
     color: #6b7280;
+
     font-size: 12px;
+
     font-weight: 600;
+
     text-align: left;
+
     padding: 14px 20px;
+
     border-bottom: 1px solid #e5e7eb;
+
     white-space: nowrap;
 }
 
 .qualificacoes-table td {
     padding: 16px 20px;
+
     font-size: 13px;
+
     border-bottom: 1px solid #f3f4f6;
+
     white-space: nowrap;
 }
 
@@ -62,63 +108,290 @@
 
 .qualificacoes-table td:first-child {
     font-weight: 600;
+
     color: #111827;
 }
 
-.qualificacoes-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+/* =========================================================
+   BOTÃO NOVA QUALIFICAÇÃO
+   ========================================================= */
 
 .nova-qualificacao-button {
     border: none;
+
     background: #2563eb;
+
     color: #ffffff;
+
     padding: 11px 16px;
+
     border-radius: 8px;
+
     font-size: 13px;
+
     font-weight: 600;
+
     cursor: pointer;
+
+    flex-shrink: 0;
+
+    transition: background-color 0.2s ease;
 }
 
 .nova-qualificacao-button:hover {
     background: #1d4ed8;
 }
 
+/* =========================================================
+   BOTÃO DE AÇÃO DA TABELA
+   ========================================================= */
+
 .qualificacoes-table td:last-child button {
     border: 1px solid #d1d5db;
+
     background: #ffffff;
+
     color: #374151;
+
     padding: 7px 12px;
+
     border-radius: 6px;
+
     font-size: 12px;
+
     font-weight: 600;
+
     cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: background-color 0.2s ease;
 }
 
 .qualificacoes-table td:last-child button:hover {
     background: #f3f4f6;
 }
 
+/* =========================================================
+   MENSAGENS
+   ========================================================= */
+
 .mensagem-sucesso {
     background: #ecfdf5;
+
     border: 1px solid #a7f3d0;
+
     color: #047857;
+
     padding: 12px 16px;
+
     border-radius: 8px;
+
     font-size: 13px;
+
     font-weight: 600;
+
     margin-bottom: 20px;
 }
 
 .mensagem-erro {
     background: #fef2f2;
+
     border: 1px solid #fecaca;
+
     color: #b91c1c;
+
     padding: 12px 16px;
+
     border-radius: 8px;
+
     font-size: 13px;
+
     font-weight: 600;
+
     margin-bottom: 20px;
+}
+
+/* =========================================================
+   TABLET
+   768px - 1023px
+   ========================================================= */
+
+@media (max-width: 1023px) {
+
+    .qualificacoes-title {
+        gap: 16px;
+    }
+
+    .qualificacoes-title h2 {
+        font-size: 22px;
+    }
+
+    .qualificacoes-table-container {
+        width: 100%;
+
+        overflow-x: auto;
+    }
+
+    .qualificacoes-table {
+        min-width: 850px;
+    }
+
+}
+
+/* =========================================================
+   MOBILE
+   Até 767px
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .qualificacoes-page {
+        width: 100%;
+
+        min-width: 0;
+    }
+
+    /* -----------------------------------------
+       Título
+       ----------------------------------------- */
+
+    .qualificacoes-title {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 16px;
+
+        margin-bottom: 20px;
+    }
+
+    .qualificacoes-title h2 {
+        font-size: 21px;
+
+        line-height: 1.25;
+
+        margin-bottom: 5px;
+    }
+
+    .qualificacoes-title p {
+        font-size: 13px;
+
+        line-height: 1.4;
+    }
+
+    /* -----------------------------------------
+       Botão nova qualificação
+       ----------------------------------------- */
+
+    .nova-qualificacao-button {
+        width: 100%;
+
+        padding: 12px 16px;
+
+        text-align: center;
+    }
+
+    /* -----------------------------------------
+       Resumo
+       ----------------------------------------- */
+
+    .qualificacoes-resumo {
+        margin-bottom: 16px;
+
+        font-size: 12px;
+
+        line-height: 1.5;
+    }
+
+    /* -----------------------------------------
+       Mensagens
+       ----------------------------------------- */
+
+    .mensagem-sucesso,
+    .mensagem-erro {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 12px 14px;
+
+        line-height: 1.4;
+    }
+
+    /* -----------------------------------------
+       Tabela
+       ----------------------------------------- */
+
+    .qualificacoes-table-container {
+        width: 100%;
+
+        max-width: 100%;
+
+        overflow-x: auto;
+
+        box-sizing: border-box;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .qualificacoes-table {
+        width: 850px;
+
+        min-width: 850px;
+    }
+
+    .qualificacoes-table th {
+        padding: 13px 16px;
+
+        font-size: 11px;
+    }
+
+    .qualificacoes-table td {
+        padding: 14px 16px;
+
+        font-size: 12px;
+    }
+
+    /* -----------------------------------------
+       Botões da tabela
+       ----------------------------------------- */
+
+    .qualificacoes-table td:last-child button {
+        padding: 7px 11px;
+
+        font-size: 11px;
+    }
+
+}
+
+/* =========================================================
+   MOBILE PEQUENO
+   Até 374px
+   ========================================================= */
+
+@media (max-width: 374px) {
+
+    .qualificacoes-title h2 {
+        font-size: 20px;
+    }
+
+    .qualificacoes-resumo {
+        font-size: 11px;
+    }
+
+    .qualificacoes-table {
+        width: 820px;
+
+        min-width: 820px;
+    }
+
+    .qualificacoes-table th {
+        padding: 12px 14px;
+    }
+
+    .qualificacoes-table td {
+        padding: 13px 14px;
+    }
+
 }
