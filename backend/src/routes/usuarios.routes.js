@@ -5,6 +5,7 @@ const {
     criarUsuario,
     buscarUsuarioPorId,
     atualizarUsuario,
+    alterarSenhaUsuario,
     desativarUsuario,
     reativarUsuario
 } = require('../controllers/usuarios.controller');
@@ -40,6 +41,13 @@ router.put(
     autenticar,
     autorizar('ADMIN'),
     atualizarUsuario
+);
+
+router.patch(
+    '/:id/senha',
+    autenticar,
+    autorizar('ADMIN'),
+    alterarSenhaUsuario
 );
 
 router.patch(

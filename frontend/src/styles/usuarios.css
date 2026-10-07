@@ -1,0 +1,754 @@
+/* =========================================================
+   USUÁRIOS
+   ========================================================= */
+
+.usuarios-page {
+    width: 100%;
+}
+
+.usuarios-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.usuarios-header h2 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.usuarios-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.usuarios-botao-novo {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.usuarios-botao-novo:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   MENSAGENS
+   ========================================================= */
+
+.usuarios-mensagem {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.usuarios-mensagem-sucesso {
+    background: #ecfdf3;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+}
+
+.usuarios-mensagem-erro {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+/* =========================================================
+   FORMULÁRIOS
+   ========================================================= */
+
+.usuarios-formulario {
+    width: 100%;
+    margin-bottom: 24px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.usuarios-formulario-senha {
+    border-left: 4px solid #4f46e5;
+}
+
+.usuarios-formulario-header {
+    margin-bottom: 22px;
+}
+
+.usuarios-formulario-header h3 {
+    margin: 0 0 6px;
+    color: #1f2937;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.usuarios-formulario-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.usuarios-formulario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+}
+
+.usuarios-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.usuarios-campo label {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.usuarios-campo input,
+.usuarios-campo select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #1f2937;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.usuarios-campo input:focus,
+.usuarios-campo select:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.usuarios-campo input::placeholder {
+    color: #9ca3af;
+}
+
+.usuarios-formulario-acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.usuarios-botao-cancelar,
+.usuarios-botao-salvar {
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.usuarios-botao-cancelar {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+}
+
+.usuarios-botao-cancelar:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.usuarios-botao-salvar {
+    border: 1px solid #4f46e5;
+    background: #4f46e5;
+    color: #ffffff;
+}
+
+.usuarios-botao-salvar:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+}
+
+/* =========================================================
+   CARREGAMENTO
+   ========================================================= */
+
+.usuarios-carregando {
+    width: 100%;
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    color: #6b7280;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* =========================================================
+   TABELA
+   ========================================================= */
+
+.usuarios-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.usuarios-tabela {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.usuarios-tabela th {
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.usuarios-tabela td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.usuarios-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.usuarios-tabela tbody tr:hover {
+    background: #fafafa;
+}
+
+.usuarios-sem-registros {
+    padding: 32px !important;
+    color: #9ca3af !important;
+    text-align: center;
+}
+
+/* =========================================================
+   PERFIL
+   ========================================================= */
+
+.usuarios-perfil {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.usuarios-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.usuarios-status-ativo {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.usuarios-status-inativo {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+
+.usuarios-acoes {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: max-content;
+}
+
+.usuarios-botao-editar,
+.usuarios-botao-senha,
+.usuarios-botao-desativar,
+.usuarios-botao-reativar {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.usuarios-botao-editar {
+    border-color: #c7d2fe;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.usuarios-botao-editar:hover {
+    background: #e0e7ff;
+}
+
+.usuarios-botao-senha {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.usuarios-botao-senha:hover {
+    background: #dbeafe;
+}
+
+.usuarios-botao-desativar {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.usuarios-botao-desativar:hover {
+    background: #fee2e2;
+}
+
+.usuarios-botao-reativar {
+    border-color: #a7f3d0;
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.usuarios-botao-reativar:hover {
+    background: #d1fae5;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1023px) {
+
+    .usuarios-header h2 {
+        font-size: 25px;
+    }
+
+    .usuarios-formulario {
+        padding: 20px;
+    }
+
+    .usuarios-tabela {
+        min-width: 1050px;
+    }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .usuarios-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .usuarios-header h2 {
+        font-size: 23px;
+    }
+
+    .usuarios-header p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .usuarios-botao-novo {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .usuarios-formulario {
+        padding: 18px;
+        border-radius: 10px;
+    }
+
+    .usuarios-formulario-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .usuarios-formulario-acoes {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .usuarios-botao-cancelar,
+    .usuarios-botao-salvar {
+        width: 100%;
+    }
+
+    .usuarios-mensagem {
+        line-height: 1.5;
+    }
+
+    .usuarios-tabela-container {
+        border-radius: 10px;
+    }
+
+    .usuarios-tabela {
+        min-width: 1050px;
+    }
+}
+
+/* =========================================================
+   MOBILE PEQUENO
+   ========================================================= */
+
+@media (max-width: 374px) {
+
+    .usuarios-header h2 {
+        font-size: 21px;
+    }
+
+    .usuarios-formulario {
+        padding: 15px;
+    }
+
+    .usuarios-tabela {
+        min-width: 1020px;
+    }
+}
+
+/* =================================================
+   MODAL DE ALTERAÇÃO DE STATUS
+================================================= */
+
+.usuarios-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.usuarios-modal {
+    width: 100%;
+    max-width: 460px;
+
+    padding: 32px;
+
+    background: #ffffff;
+    border-radius: 16px;
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+    text-align: center;
+
+    animation: usuariosModalEntrada 0.2s ease-out;
+}
+
+.usuarios-modal-icone {
+    width: 52px;
+    height: 52px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f3f4f6;
+    color: #374151;
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.usuarios-modal h3 {
+    margin: 0 0 12px;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+.usuarios-modal p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.usuarios-modal-acoes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+.usuarios-modal-acoes button {
+    min-width: 120px;
+
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.usuarios-modal-acoes button:hover {
+    transform: translateY(-1px);
+}
+
+.usuarios-modal-cancelar {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.usuarios-modal-cancelar:hover {
+    background: #e5e7eb;
+}
+
+.usuarios-modal-confirmar {
+    color: #ffffff;
+}
+
+.usuarios-modal-desativar {
+    background: #dc2626;
+}
+
+.usuarios-modal-desativar:hover {
+    background: #b91c1c;
+}
+
+.usuarios-modal-reativar {
+    background: #16a34a;
+}
+
+.usuarios-modal-reativar:hover {
+    background: #15803d;
+}
+
+@keyframes usuariosModalEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =================================================
+   MODAL - MOBILE
+================================================= */
+
+@media (max-width: 767px) {
+    .usuarios-modal-overlay {
+        padding: 16px;
+    }
+
+    .usuarios-modal {
+        max-width: 100%;
+        padding: 26px 20px;
+        border-radius: 14px;
+    }
+
+    .usuarios-modal h3 {
+        font-size: 19px;
+    }
+
+    .usuarios-modal p {
+        font-size: 14px;
+    }
+
+    .usuarios-modal-acoes {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .usuarios-modal-acoes button {
+        width: 100%;
+    }
+}
+
+/* =================================================
+   RESPONSIVIDADE - USUÁRIOS
+================================================= */
+
+@media (max-width: 1023px) {
+
+    .usuarios-header {
+        gap: 20px;
+    }
+
+    .usuarios-header h2 {
+        font-size: 26px;
+    }
+
+    .usuarios-tabela-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .usuarios-tabela {
+        min-width: 1050px;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .usuarios-page {
+        width: 100%;
+    }
+
+    .usuarios-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .usuarios-header h2 {
+        font-size: 24px;
+    }
+
+    .usuarios-header p {
+        font-size: 14px;
+    }
+
+    .usuarios-botao-novo {
+        width: 100%;
+    }
+
+    .usuarios-mensagem {
+        width: 100%;
+    }
+
+    .usuarios-formulario {
+        width: 100%;
+    }
+
+    .usuarios-formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .usuarios-formulario-acoes {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .usuarios-formulario-acoes button {
+        width: 100%;
+    }
+
+    .usuarios-tabela-container {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .usuarios-tabela {
+        min-width: 1050px;
+    }
+
+    .usuarios-acoes {
+        flex-wrap: wrap;
+    }
+
+}
+
+@media (max-width: 374px) {
+
+    .usuarios-header h2 {
+        font-size: 22px;
+    }
+
+    .usuarios-header p {
+        font-size: 13px;
+    }
+
+    .usuarios-tabela {
+        min-width: 1020px;
+    }
+
+    .usuarios-modal {
+        padding: 24px 18px;
+    }
+
+    .usuarios-modal h3 {
+        font-size: 18px;
+    }
+
+    .usuarios-modal p {
+        font-size: 13px;
+    }
+
+}

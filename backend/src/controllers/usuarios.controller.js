@@ -90,6 +90,31 @@ const atualizarUsuario = async (req, res) => {
     }
 };
 
+const alterarSenhaUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { novaSenha } = req.body;
+
+        const resultado = await usuariosService.alterarSenhaUsuario(
+            id,
+            novaSenha,
+            req.usuario.id
+        );
+
+        return res.status(200).json({
+            mensagem: 'Senha alterada com sucesso',
+            usuario: resultado
+        });
+
+    } catch (error) {
+        console.error('Erro ao alterar senha:', error);
+
+        return res.status(400).json({
+            mensagem: error.message
+        });
+    }
+};
+
 const desativarUsuario = async (req, res) => {
     try {
         const { id } = req.params;
@@ -141,6 +166,7 @@ module.exports = {
     criarUsuario,
     buscarUsuarioPorId,
     atualizarUsuario,
+    alterarSenhaUsuario,
     desativarUsuario,
     reativarUsuario
 };

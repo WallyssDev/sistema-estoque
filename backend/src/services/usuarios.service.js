@@ -138,7 +138,13 @@ const buscarUsuarioPorId = async (id) => {
     return resultado.rows[0];
 };
 
-const atualizarUsuario = async (id, nome, email, perfil, usuarioLogadoId) => {
+const atualizarUsuario = async (
+    id,
+    nome,
+    email,
+    perfil,
+    usuarioLogadoId
+) => {
 
     if (!id || isNaN(id)) {
         throw new Error('ID do usuário inválido');
@@ -259,13 +265,102 @@ const atualizarUsuario = async (id, nome, email, perfil, usuarioLogadoId) => {
                     valorNovo: alteracao.novo,
                     db: client
                 });
-
             }
         }
 
         await client.query('COMMIT');
 
         return usuarioAtualizado;
+
+    } catch (error) {
+
+        if (client) {
+            await client.query('ROLLBACK');
+        }
+
+        throw error;
+
+    } finally {
+
+        if (client) {
+            client.release();
+        }
+    }
+};
+
+const alterarSenhaUsuario = async (
+    id,
+    novaSenha,
+    usuarioLogadoId
+) => {
+
+    if (!id || isNaN(id)) {
+        throw new Error('ID do usuário inválido');
+    }
+
+    if (!novaSenha) {
+        throw new Error('A nova senha é obrigatória');
+    }
+
+    if (novaSenha.length < 8) {
+        throw new Error(
+            'A senha deve possuir pelo menos 8 caracteres'
+        );
+    }
+
+    const usuarioExistente = await pool.query(
+        `
+        SELECT
+            id,
+            nome
+        FROM usuarios
+        WHERE id = $1
+        `,
+        [id]
+    );
+
+    if (usuarioExistente.rows.length === 0) {
+        throw new Error('Usuário não encontrado');
+    }
+
+    const senhaHash = await bcrypt.hash(novaSenha, 10);
+
+    let client;
+
+    try {
+
+        client = await pool.connect();
+
+        await client.query('BEGIN');
+
+        await client.query(
+            `
+            UPDATE usuarios
+            SET
+                senha = $1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $2
+            `,
+            [senhaHash, id]
+        );
+
+        await registrarAuditoria({
+            usuarioId: usuarioLogadoId,
+            acao: 'ALTERACAO',
+            entidade: 'USUARIO',
+            registroId: Number(id),
+            campo: 'senha',
+            valorAnterior: 'SENHA_NAO_EXIBIDA',
+            valorNovo: 'SENHA_ALTERADA',
+            db: client
+        });
+
+        await client.query('COMMIT');
+
+        return {
+            id: Number(id),
+            nome: usuarioExistente.rows[0].nome
+        };
 
     } catch (error) {
 
@@ -438,6 +533,7 @@ module.exports = {
     criarUsuario,
     buscarUsuarioPorId,
     atualizarUsuario,
+    alterarSenhaUsuario,
     desativarUsuario,
     reativarUsuario
 };
