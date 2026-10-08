@@ -145,7 +145,6 @@ const atualizarUsuario = async (
     perfil,
     usuarioLogadoId
 ) => {
-
     if (!id || isNaN(id)) {
         throw new Error('ID do usuário inválido');
     }
@@ -175,7 +174,8 @@ const atualizarUsuario = async (
             id,
             nome,
             email,
-            perfil
+            perfil,
+            ativo
         FROM usuarios
         WHERE id = $1
         `,
@@ -187,6 +187,53 @@ const atualizarUsuario = async (
     }
 
     const usuarioAnterior = usuarioExistente.rows[0];
+
+    /*
+     * Regra de segurança:
+     * o ADMIN logado não pode alterar o próprio perfil
+     * para EDITOR ou LEITOR.
+     */
+    if (
+        Number(id) === Number(usuarioLogadoId) &&
+        usuarioAnterior.perfil === 'ADMIN' &&
+        perfil !== 'ADMIN'
+    ) {
+        throw new Error(
+            'Você não pode alterar o próprio perfil de administrador'
+        );
+    }
+
+    /*
+     * Regra de segurança:
+     * não permitir que o sistema fique sem nenhum ADMIN ativo.
+     *
+     * Essa verificação só é necessária quando estamos
+     * rebaixando um ADMIN ativo para outro perfil.
+     */
+    if (
+        usuarioAnterior.perfil === 'ADMIN' &&
+        usuarioAnterior.ativo === true &&
+        perfil !== 'ADMIN'
+    ) {
+        const quantidadeAdmins = await pool.query(
+            `
+            SELECT COUNT(*) AS total
+            FROM usuarios
+            WHERE perfil = 'ADMIN'
+              AND ativo = true
+            `
+        );
+
+        const totalAdmins = Number(
+            quantidadeAdmins.rows[0].total
+        );
+
+        if (totalAdmins <= 1) {
+            throw new Error(
+                'Não é possível remover o último administrador ativo do sistema'
+            );
+        }
+    }
 
     const emailEmUso = await pool.query(
         `
@@ -205,7 +252,6 @@ const atualizarUsuario = async (
     let client;
 
     try {
-
         client = await pool.connect();
 
         await client.query('BEGIN');
@@ -252,9 +298,7 @@ const atualizarUsuario = async (
         ];
 
         for (const alteracao of camposAlterados) {
-
             if (alteracao.anterior !== alteracao.novo) {
-
                 await registrarAuditoria({
                     usuarioId: usuarioLogadoId,
                     acao: 'ALTERACAO',
@@ -273,7 +317,6 @@ const atualizarUsuario = async (
         return usuarioAtualizado;
 
     } catch (error) {
-
         if (client) {
             await client.query('ROLLBACK');
         }
@@ -281,7 +324,6 @@ const atualizarUsuario = async (
         throw error;
 
     } finally {
-
         if (client) {
             client.release();
         }
