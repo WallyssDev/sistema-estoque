@@ -1,0 +1,552 @@
+.relatorios-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.relatorios-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.relatorios-header h2 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    line-height: 1.2;
+    color: #111827;
+}
+
+.relatorios-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.relatorio-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.relatorio-card-header {
+    padding: 20px 22px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.relatorio-card-header h3,
+.relatorio-resultado-header h3 {
+    margin: 0 0 5px;
+    color: #111827;
+    font-size: 18px;
+}
+
+.relatorio-card-header p,
+.relatorio-resultado-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* =========================
+   FILTROS
+========================= */
+
+.relatorio-filtros {
+    padding: 22px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 18px;
+}
+
+.campo-relatorio {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.campo-relatorio label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.campo-relatorio input,
+.campo-relatorio select {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.campo-relatorio input::placeholder {
+    color: #9ca3af;
+}
+
+.campo-relatorio input:focus,
+.campo-relatorio select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================
+   AÇÕES
+========================= */
+
+.relatorio-acoes {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+.botao-relatorio {
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.botao-relatorio:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.botao-principal {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.botao-principal:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.botao-secundario {
+    background: #ffffff;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+.botao-secundario:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* =========================
+   MENSAGENS
+========================= */
+
+.mensagem-relatorio {
+    margin: 0 22px 20px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mensagem-erro {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.mensagem-sucesso {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+/* =========================
+   RESULTADO
+========================= */
+
+.relatorio-resultado-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.relatorio-vazio {
+    padding: 40px 22px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* =========================
+   TABELA
+========================= */
+
+.relatorio-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.relatorio-tabela {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.relatorio-tabela thead {
+    background: #f9fafb;
+}
+
+.relatorio-tabela th {
+    padding: 13px 14px;
+    text-align: left;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.relatorio-tabela td {
+    padding: 13px 14px;
+    color: #374151;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.relatorio-tabela tbody tr:hover {
+    background: #f9fafb;
+}
+
+.relatorio-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.relatorio-tabela td:first-child {
+    font-weight: 600;
+    color: #111827;
+}
+
+.relatorio-tabela td:nth-child(2) {
+    min-width: 180px;
+}
+
+.relatorio-tabela td:nth-child(3) {
+    min-width: 140px;
+}
+
+.relatorio-tabela td:nth-child(5) {
+    min-width: 220px;
+}
+
+.relatorio-tabela td:nth-child(6),
+.relatorio-tabela td:nth-child(7),
+.relatorio-tabela td:nth-child(8) {
+    white-space: nowrap;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1100px) {
+    .relatorio-filtros {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 767px) {
+    .relatorios-header {
+        margin-bottom: 18px;
+    }
+
+    .relatorios-header h2 {
+        font-size: 24px;
+    }
+
+    .relatorio-card {
+        border-radius: 8px;
+    }
+
+    .relatorio-card-header,
+    .relatorio-resultado-header {
+        padding: 16px;
+    }
+
+    .relatorio-filtros {
+        padding: 16px;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .relatorio-acoes {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .botao-relatorio {
+        width: 100%;
+    }
+
+    .mensagem-relatorio {
+        margin: 0 16px 16px;
+    }
+
+    .relatorio-tabela {
+        min-width: 1100px;
+    }
+
+    .relatorio-tabela th,
+    .relatorio-tabela td {
+        padding: 11px 12px;
+    }
+}
+
+/* =========================================================
+   BOTÕES DE EXPORTAÇÃO
+   ========================================================= */
+
+.relatorios-exportacoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.relatorios-exportar-button {
+    min-height: 40px;
+    padding: 0 16px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.relatorios-exportar-button:hover {
+    transform: translateY(-1px);
+}
+
+.relatorios-exportar-button:active {
+    transform: translateY(0);
+}
+
+.relatorios-exportar-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.2);
+    outline-offset: 2px;
+}
+
+/* Excel */
+
+.relatorios-exportar-excel {
+    background-color: #ffffff;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.relatorios-exportar-excel:hover {
+    background-color: #eff6ff;
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+}
+
+/* PDF */
+
+.relatorios-exportar-pdf {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.relatorios-exportar-pdf:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Estado desabilitado */
+
+.relatorios-exportar-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* =========================================================
+   RESPONSIVIDADE DOS BOTÕES
+   ========================================================= */
+
+@media (max-width: 767px) {
+    .relatorio-resultado-header {
+        align-items: flex-start;
+    }
+
+    .relatorios-exportacoes {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .relatorios-exportar-button {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .relatorios-exportacoes {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .relatorios-exportar-button {
+        width: 100%;
+        flex: none;
+    }
+}
+
+/* =========================================================
+   PAINÉIS EXPANSÍVEIS DOS RELATÓRIOS
+   ========================================================= */
+
+.relatorio-painel {
+    overflow: hidden;
+}
+
+.relatorio-painel-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 20px 22px;
+    border: none;
+    background-color: #ffffff;
+    color: #111827;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.relatorio-painel-cabecalho:hover {
+    background-color: #f9fafb;
+}
+
+.relatorio-painel-cabecalho:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+    outline-offset: -3px;
+}
+
+.relatorio-painel-titulo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.relatorio-painel-titulo h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.relatorio-painel-titulo p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.relatorio-painel-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #4b5563;
+    font-size: 22px;
+    line-height: 1;
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.relatorio-painel-cabecalho:hover .relatorio-painel-icone {
+    background-color: #eff6ff;
+}
+
+.relatorio-painel-icone.aberto {
+    transform: rotate(90deg);
+}
+
+.relatorio-painel-conteudo {
+    border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 767px) {
+    .relatorio-painel-cabecalho {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .relatorio-painel-titulo h3 {
+        font-size: 16px;
+    }
+
+    .relatorio-painel-titulo p {
+        font-size: 12px;
+    }
+
+    .relatorio-painel-icone {
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+    }
+}

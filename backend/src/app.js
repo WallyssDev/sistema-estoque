@@ -10,6 +10,7 @@ const qualificacoesRoutes = require('./routes/qualificacoes.routes');
 const operacionaisRoutes = require('./routes/operacionais.routes');
 const regulatoriosRoutes = require('./routes/regulatorios.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const relatoriosRoutes = require('./routes/relatorios.routes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/qualificacoes', qualificacoesRoutes);
 app.use('/api/operacionais', operacionaisRoutes);
 app.use('/api/regulatorios', regulatoriosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/relatorios', relatoriosRoutes);
 
 app.get('/', (req, res) => {
     res.json({
