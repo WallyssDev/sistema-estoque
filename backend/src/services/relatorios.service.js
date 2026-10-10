@@ -188,7 +188,243 @@ const listarManutencoes = async ({
 };
 
 
+const listarQualificacoes = async ({
+    codigo = null,
+    nome = null,
+    tipo = null,
+    responsavel = null,
+    resultado = null,
+    dataQualificacao = null,
+    proximaQualificacao = null,
+    status = null
+} = {}) => {
+    const valores = [];
+    const filtros = [];
+
+    let consulta = `
+        SELECT
+            q.id,
+            q.equipamento_id,
+            e.codigo,
+            e.nome,
+            q.tipo,
+            q.data_qualificacao,
+            q.proxima_qualificacao,
+            q.responsavel,
+            q.resultado,
+            q.descricao,
+            q.observacoes,
+            q.created_at,
+
+            CASE
+                WHEN q.proxima_qualificacao IS NULL
+                    THEN 'SEM AGENDAMENTO'
+
+                WHEN q.proxima_qualificacao < CURRENT_DATE
+                    THEN 'VENCIDA'
+
+                WHEN q.proxima_qualificacao <= CURRENT_DATE + INTERVAL '7 days'
+                    THEN 'PRÓXIMA'
+
+                ELSE 'EM DIA'
+            END AS status
+
+        FROM qualificacoes q
+
+        INNER JOIN equipamentos e
+            ON e.id = q.equipamento_id
+    `;
+
+    if (codigo) {
+        valores.push(`%${codigo}%`);
+        filtros.push(`e.codigo ILIKE $${valores.length}`);
+    }
+
+    if (nome) {
+        valores.push(`%${nome}%`);
+        filtros.push(`e.nome ILIKE $${valores.length}`);
+    }
+
+    if (tipo) {
+        valores.push(tipo);
+        filtros.push(`q.tipo = $${valores.length}`);
+    }
+
+    if (responsavel) {
+        valores.push(`%${responsavel}%`);
+        filtros.push(`q.responsavel ILIKE $${valores.length}`);
+    }
+
+    if (resultado) {
+        valores.push(resultado);
+        filtros.push(`q.resultado = $${valores.length}`);
+    }
+
+    if (dataQualificacao) {
+        valores.push(dataQualificacao);
+        filtros.push(`q.data_qualificacao = $${valores.length}`);
+    }
+
+    if (proximaQualificacao) {
+        valores.push(proximaQualificacao);
+        filtros.push(`q.proxima_qualificacao = $${valores.length}`);
+    }
+
+    if (status) {
+        valores.push(status);
+        filtros.push(`
+            CASE
+                WHEN q.proxima_qualificacao IS NULL
+                    THEN 'SEM AGENDAMENTO'
+
+                WHEN q.proxima_qualificacao < CURRENT_DATE
+                    THEN 'VENCIDA'
+
+                WHEN q.proxima_qualificacao <= CURRENT_DATE + INTERVAL '7 days'
+                    THEN 'PRÓXIMA'
+
+                ELSE 'EM DIA'
+            END = $${valores.length}
+        `);
+    }
+
+    if (filtros.length > 0) {
+        consulta += ` WHERE ${filtros.join(' AND ')}`;
+    }
+
+    consulta += `
+        ORDER BY
+            q.proxima_qualificacao ASC NULLS LAST,
+            e.codigo ASC,
+            q.id ASC
+    `;
+
+    const resultadoConsulta = await pool.query(consulta, valores);
+
+    return resultadoConsulta.rows;
+};
+
+
+
+
+const listarOperacionais = async ({
+    codigo = null,
+    nome = null,
+    modelo = null,
+    numeroPatrimonioFase = null,
+    registroAnvisaMs = null,
+    unidade = null,
+    sala = null,
+    dataAquisicao = null,
+    statusOperacional = null,
+    frequenciaManutencaoInterna = null,
+    frequenciaManutencaoExterna = null
+} = {}) => {
+    const valores = [];
+    const filtros = [];
+
+    let consulta = `
+        SELECT
+            o.id,
+            o.equipamento_id,
+            e.codigo,
+            e.nome,
+            o.modelo,
+            o.numero_patrimonio_fase,
+            o.registro_anvisa_ms,
+            o.unidade,
+            o.sala,
+            o.data_aquisicao,
+            o.status_operacional,
+            o.frequencia_manutencao_interna,
+            o.frequencia_manutencao_externa,
+            o.created_at
+        FROM operacionais o
+        INNER JOIN equipamentos e
+            ON e.id = o.equipamento_id
+    `;
+
+    if (codigo) {
+        valores.push(`%${codigo}%`);
+        filtros.push(`e.codigo ILIKE $${valores.length}`);
+    }
+
+    if (nome) {
+        valores.push(`%${nome}%`);
+        filtros.push(`e.nome ILIKE $${valores.length}`);
+    }
+
+    if (modelo) {
+        valores.push(`%${modelo}%`);
+        filtros.push(`o.modelo ILIKE $${valores.length}`);
+    }
+
+    if (numeroPatrimonioFase) {
+        valores.push(`%${numeroPatrimonioFase}%`);
+        filtros.push(
+            `o.numero_patrimonio_fase ILIKE $${valores.length}`
+        );
+    }
+
+    if (registroAnvisaMs) {
+        valores.push(`%${registroAnvisaMs}%`);
+        filtros.push(
+            `o.registro_anvisa_ms ILIKE $${valores.length}`
+        );
+    }
+
+    if (unidade) {
+        valores.push(`%${unidade}%`);
+        filtros.push(`o.unidade ILIKE $${valores.length}`);
+    }
+
+    if (sala) {
+        valores.push(`%${sala}%`);
+        filtros.push(`o.sala ILIKE $${valores.length}`);
+    }
+
+    if (dataAquisicao) {
+        valores.push(dataAquisicao);
+        filtros.push(`o.data_aquisicao = $${valores.length}`);
+    }
+
+    if (statusOperacional) {
+        valores.push(statusOperacional);
+        filtros.push(
+            `o.status_operacional = $${valores.length}`
+        );
+    }
+
+    if (frequenciaManutencaoInterna) {
+        valores.push(`%${frequenciaManutencaoInterna}%`);
+        filtros.push(
+            `o.frequencia_manutencao_interna ILIKE $${valores.length}`
+        );
+    }
+
+    if (frequenciaManutencaoExterna) {
+        valores.push(`%${frequenciaManutencaoExterna}%`);
+        filtros.push(
+            `o.frequencia_manutencao_externa ILIKE $${valores.length}`
+        );
+    }
+
+    if (filtros.length > 0) {
+        consulta += ` WHERE ${filtros.join(' AND ')}`;
+    }
+
+    consulta += `
+        ORDER BY e.codigo ASC, o.id ASC
+    `;
+
+    const resultado = await pool.query(consulta, valores);
+
+    return resultado.rows;
+};
+
 module.exports = {
     listarEquipamentos,
-    listarManutencoes
+    listarManutencoes,
+    listarQualificacoes,
+    listarOperacionais
 };

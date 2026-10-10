@@ -1,9 +1,13 @@
 const express = require('express');
 
+
 const {
     listarEquipamentos,
-    listarManutencoes
+    listarManutencoes,
+    listarQualificacoes,
+    listarOperacionais
 } = require('../controllers/relatorios.controller');
+
 
 const { autenticar } = require('../middlewares/auth.middleware');
 const { autorizar } = require('../middlewares/permissao.middleware');
@@ -23,5 +27,23 @@ router.get(
     autorizar('ADMIN', 'EDITOR', 'LEITOR'),
     listarManutencoes
 );
+
+router.get(
+    '/qualificacoes',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR', 'LEITOR'),
+    listarQualificacoes
+);
+
+
+
+router.get(
+    '/operacionais',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR', 'LEITOR'),
+    listarOperacionais
+);
+
+
 
 module.exports = router;

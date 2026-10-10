@@ -32,6 +32,13 @@ function Relatorios() {
     const [manutencoes, setManutencoes] = useState([]);
     const [carregandoManutencoes, setCarregandoManutencoes] = useState(false);
     const [erroManutencoes, setErroManutencoes] = useState('');
+    const [qualificacoes, setQualificacoes] = useState([]);
+    const [carregandoQualificacoes, setCarregandoQualificacoes] = useState(false);
+    const [erroQualificacoes, setErroQualificacoes] = useState('');
+    const [operacionais, setOperacionais] = useState([]);
+    const [carregandoOperacionais, setCarregandoOperacionais] = useState(false);
+    const [erroOperacionais, setErroOperacionais] = useState('');
+
 
 
     const mensagemTimeoutRef = useRef(null);
@@ -69,6 +76,32 @@ function Relatorios() {
         data_manutencao: '',
         proxima_manutencao: '',
         status: ''
+    });
+
+    const [filtrosQualificacoes, setFiltrosQualificacoes] = useState({
+        codigo: '',
+        nome: '',
+        tipo: '',
+        responsavel: '',
+        resultado: '',
+        data_qualificacao: '',
+        proxima_qualificacao: '',
+        status: ''
+    });
+
+
+    const [filtrosOperacionais, setFiltrosOperacionais] = useState({
+        codigo: '',
+        nome: '',
+        modelo: '',
+        numero_patrimonio_fase: '',
+        registro_anvisa_ms: '',
+        unidade: '',
+        sala: '',
+        data_aquisicao: '',
+        status_operacional: '',
+        frequencia_manutencao_interna: '',
+        frequencia_manutencao_externa: ''
     });
 
 
@@ -140,15 +173,459 @@ function Relatorios() {
     };
 
 
+    const carregarQualificacoes = async (filtrosAtuais = filtrosQualificacoes) => {
+        try {
+            setCarregandoQualificacoes(true);
+            setErroQualificacoes('');
+
+            const parametros = {};
+
+            Object.entries(filtrosAtuais).forEach(([chave, valor]) => {
+                if (valor !== '') {
+                    parametros[chave] = valor;
+                }
+            });
+
+            const resposta = await api.get('/relatorios/qualificacoes', {
+                params: parametros
+            });
+
+            setQualificacoes(resposta.data.qualificacoes || []);
+        } catch (error) {
+            console.error(
+                'Erro ao carregar relatório de qualificações:',
+                error
+            );
+
+            setQualificacoes([]);
+
+            setErroQualificacoes(
+                error.response?.data?.mensagem ||
+                'Erro ao carregar relatório de qualificações.'
+            );
+        } finally {
+            setCarregandoQualificacoes(false);
+        }
+    };
+
+    const carregarOperacionais = async (filtrosAtuais = filtrosOperacionais) => {
+        try {
+            setCarregandoOperacionais(true);
+            setErroOperacionais('');
+
+            const parametros = {};
+
+            Object.entries(filtrosAtuais).forEach(([chave, valor]) => {
+                if (valor !== '') {
+                    parametros[chave] = valor;
+                }
+            });
+
+            const resposta = await api.get('/relatorios/operacionais', {
+                params: parametros
+            });
+
+            setOperacionais(resposta.data.operacionais || []);
+        } catch (error) {
+            console.error('Erro ao carregar relatório operacional:', error);
+            setOperacionais([]);
+            setErroOperacionais(
+                error.response?.data?.mensagem ||
+                'Erro ao carregar relatório operacional.'
+            );
+        } finally {
+            setCarregandoOperacionais(false);
+        }
+    };
+
+    const exportarOperacionaisExcel = () => {
+        if (operacionais.length === 0) {
+            setErroOperacionais('Não há registros operacionais para exportar.');
+            return;
+        }
+
+        try {
+            const dataAtual = new Date();
+            const dataArquivo = dataAtual.toISOString().slice(0, 10);
+
+            const bordaPadrao = {
+                top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+            };
+
+            const estiloTitulo = {
+                font: { bold: true, sz: 18, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '111827' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+
+            const estiloSubtitulo = {
+                font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '1F2937' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+
+            const estiloInformacao = {
+                font: { sz: 10, color: { rgb: '4B5563' } },
+                fill: { patternType: 'solid', fgColor: { rgb: 'F3F4F6' } },
+                alignment: { horizontal: 'left', vertical: 'center' },
+                border: bordaPadrao
+            };
+
+            const estiloCabecalho = {
+                font: { bold: true, sz: 10, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '2563EB' } },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                },
+                border: bordaPadrao
+            };
+
+            const estiloCelula = {
+                font: { sz: 10, color: { rgb: '374151' } },
+                alignment: { vertical: 'center', wrapText: true },
+                border: bordaPadrao
+            };
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const filtrosAplicados = Object.entries({
+                'Código': filtrosOperacionais.codigo,
+                'Equipamento': filtrosOperacionais.nome,
+                'Modelo': filtrosOperacionais.modelo,
+                'Patrimônio': filtrosOperacionais.numero_patrimonio_fase,
+                'Registro ANVISA': filtrosOperacionais.registro_anvisa_ms,
+                'Unidade': filtrosOperacionais.unidade,
+                'Sala': filtrosOperacionais.sala,
+                'Data de aquisição': filtrosOperacionais.data_aquisicao,
+                'Status': filtrosOperacionais.status_operacional,
+                'Manutenção interna': filtrosOperacionais.frequencia_manutencao_interna,
+                'Manutenção externa': filtrosOperacionais.frequencia_manutencao_externa
+            })
+                .filter(([, valor]) => valor !== '')
+                .map(([campo, valor]) => `${campo}: ${valor}`);
+
+            const cabecalhos = [
+                'Código',
+                'Equipamento',
+                'Modelo',
+                'Patrimônio',
+                'Registro ANVISA',
+                'Unidade',
+                'Sala',
+                'Data de aquisição',
+                'Status',
+                'Manutenção interna',
+                'Manutenção externa'
+            ];
+
+            const linhas = operacionais.map((item) => [
+                item.codigo || '-',
+                item.nome || '-',
+                item.modelo || '-',
+                item.numero_patrimonio_fase || '-',
+                item.registro_anvisa_ms || '-',
+                item.unidade || '-',
+                item.sala || '-',
+                formatarData(item.data_aquisicao),
+                item.status_operacional || '-',
+                item.frequencia_manutencao_interna || '-',
+                item.frequencia_manutencao_externa || '-'
+            ].map((valor) => ({
+                v: valor,
+                t: 's',
+                s: estiloCelula
+            })));
+
+            const totalColunas = cabecalhos.length;
+
+            const linhaMesclada = (texto, estilo) => [
+                { v: texto, t: 's', s: estilo },
+                ...Array.from({ length: totalColunas - 1 }, () => ({
+                    v: '',
+                    t: 's',
+                    s: estilo
+                }))
+            ];
+
+            const dados = [
+                linhaMesclada('SISTEMA DE CONTROLE DE ESTOQUE', estiloTitulo),
+                linhaMesclada('RELATÓRIO OPERACIONAL', estiloSubtitulo),
+                linhaMesclada(
+                    `Gerado em: ${dataAtual.toLocaleDateString('pt-BR')} às ${dataAtual.toLocaleTimeString('pt-BR')}`,
+                    estiloInformacao
+                ),
+                linhaMesclada(`Total de registros: ${operacionais.length}`, estiloInformacao),
+                linhaMesclada(
+                    `Filtros aplicados: ${filtrosAplicados.length ? filtrosAplicados.join(' | ') : 'Nenhum'}`,
+                    estiloInformacao
+                ),
+                cabecalhos.map((texto) => ({
+                    v: texto,
+                    t: 's',
+                    s: estiloCabecalho
+                })),
+                ...linhas
+            ];
+
+            const planilha = XLSX.utils.aoa_to_sheet(dados);
+
+            planilha['!merges'] = [0, 1, 2, 3, 4].map((linha) => ({
+                s: { r: linha, c: 0 },
+                e: { r: linha, c: totalColunas - 1 }
+            }));
+
+            planilha['!cols'] = [
+                { wch: 14 },
+                { wch: 28 },
+                { wch: 25 },
+                { wch: 22 },
+                { wch: 24 },
+                { wch: 28 },
+                { wch: 22 },
+                { wch: 22 },
+                { wch: 20 },
+                { wch: 24 },
+                { wch: 24 }
+            ];
+
+            planilha['!rows'] = [
+                { hpt: 30 },
+                { hpt: 24 },
+                { hpt: 22 },
+                { hpt: 22 },
+                { hpt: 36 },
+                { hpt: 30 },
+                ...operacionais.map(() => ({ hpt: 24 }))
+            ];
+
+            planilha['!autofilter'] = {
+                ref: `A6:K${dados.length}`
+            };
+
+            const livro = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(livro, planilha, 'Operacional');
+
+            XLSX.writeFile(
+                livro,
+                `Relatorio_Operacional_${dataArquivo}.xlsx`
+            );
+
+            setErroOperacionais('');
+            mostrarMensagem('Relatório Excel operacional exportado com sucesso.');
+        } catch (error) {
+            console.error('Erro ao exportar relatório operacional para Excel:', error);
+            setErroOperacionais('Erro ao exportar relatório operacional para Excel.');
+        }
+    };
+
+    const exportarOperacionaisPDF = () => {
+        if (operacionais.length === 0) {
+            setErroOperacionais('Não há registros operacionais para exportar.');
+            return;
+        }
+
+        try {
+            const documento = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const margem = 14;
+            const larguraPagina = documento.internal.pageSize.getWidth();
+            const alturaPagina = documento.internal.pageSize.getHeight();
+            const larguraConteudo = larguraPagina - margem * 2;
+            const azulEscuro = [17, 24, 39];
+            const azulCabecalho = [37, 99, 235];
+            const cinzaTexto = [71, 85, 105];
+            const branco = [255, 255, 255];
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const filtrosAplicados = Object.entries({
+                'Código': filtrosOperacionais.codigo,
+                'Equipamento': filtrosOperacionais.nome,
+                'Modelo': filtrosOperacionais.modelo,
+                'Patrimônio': filtrosOperacionais.numero_patrimonio_fase,
+                'Registro ANVISA': filtrosOperacionais.registro_anvisa_ms,
+                'Unidade': filtrosOperacionais.unidade,
+                'Sala': filtrosOperacionais.sala,
+                'Data de aquisição': filtrosOperacionais.data_aquisicao,
+                'Status': filtrosOperacionais.status_operacional,
+                'Manutenção interna': filtrosOperacionais.frequencia_manutencao_interna,
+                'Manutenção externa': filtrosOperacionais.frequencia_manutencao_externa
+            })
+                .filter(([, valor]) => valor !== '')
+                .map(([campo, valor]) => `${campo}: ${valor}`);
+
+            documento.setFillColor(...azulEscuro);
+            documento.rect(margem, 10, larguraConteudo, 23, 'F');
+            documento.setTextColor(...branco);
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(16);
+            documento.text('SISTEMA DE CONTROLE DE ESTOQUE', larguraPagina / 2, 19, {
+                align: 'center'
+            });
+            documento.setFontSize(12);
+            documento.text('RELATÓRIO OPERACIONAL', larguraPagina / 2, 27, {
+                align: 'center'
+            });
+
+            documento.setTextColor(...cinzaTexto);
+            documento.setFont('helvetica', 'normal');
+            documento.setFontSize(8.5);
+            documento.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margem, 40);
+            documento.text(`Total de registros: ${operacionais.length}`, larguraPagina - margem, 40, {
+                align: 'right'
+            });
+            documento.setFont('helvetica', 'bold');
+            documento.text('Filtros aplicados:', margem, 48);
+            documento.setFont('helvetica', 'normal');
+            const textoFiltros = filtrosAplicados.length
+                ? filtrosAplicados.join(' | ')
+                : 'Nenhum';
+            const linhasFiltros = documento.splitTextToSize(textoFiltros, larguraConteudo - 35);
+            documento.text(linhasFiltros, margem + 30, 48);
+            const inicioTabela = 53 + Math.max(0, (linhasFiltros.length - 1) * 4);
+
+            const cabecalhos = [
+                'Código', 'Equipamento', 'Modelo', 'Patrimônio',
+                'Registro ANVISA', 'Unidade', 'Sala', 'Data de aquisição',
+                'Status', 'Manutenção interna', 'Manutenção externa'
+            ];
+            const linhas = operacionais.map((item) => [
+                item.codigo || '-',
+                item.nome || '-',
+                item.modelo || '-',
+                item.numero_patrimonio_fase || '-',
+                item.registro_anvisa_ms || '-',
+                item.unidade || '-',
+                item.sala || '-',
+                formatarData(item.data_aquisicao),
+                item.status_operacional || '-',
+                item.frequencia_manutencao_interna || '-',
+                item.frequencia_manutencao_externa || '-'
+            ]);
+
+            autoTable(documento, {
+                head: [cabecalhos],
+                body: linhas,
+                startY: inicioTabela,
+                margin: { left: margem, right: margem, bottom: 14 },
+                theme: 'grid',
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 6.5,
+                    textColor: [30, 41, 59],
+                    cellPadding: 2,
+                    lineColor: [203, 213, 225],
+                    lineWidth: 0.2,
+                    valign: 'middle',
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: azulCabecalho,
+                    textColor: branco,
+                    fontStyle: 'bold',
+                    fontSize: 7,
+                    halign: 'center',
+                    valign: 'middle'
+                },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+                columnStyles: {
+                    0: { cellWidth: 17 },
+                    1: { cellWidth: 30 },
+                    2: { cellWidth: 25 },
+                    3: { cellWidth: 24 },
+                    4: { cellWidth: 27 },
+                    5: { cellWidth: 29 },
+                    6: { cellWidth: 20 },
+                    7: { cellWidth: 23 },
+                    8: { cellWidth: 19 },
+                    9: { cellWidth: 25 },
+                    10: { cellWidth: 25 }
+                },
+                didParseCell: (dados) => {
+                    if (dados.section !== 'body' || dados.column.index !== 8) return;
+                    const status = String(dados.cell.raw || '').toUpperCase();
+                    if (status === 'ATIVO') {
+                        dados.cell.styles.fillColor = [220, 252, 231];
+                        dados.cell.styles.textColor = [22, 101, 52];
+                        dados.cell.styles.fontStyle = 'bold';
+                    } else if (status === 'INATIVO') {
+                        dados.cell.styles.fillColor = [254, 226, 226];
+                        dados.cell.styles.textColor = [185, 28, 28];
+                        dados.cell.styles.fontStyle = 'bold';
+                    } else if (status === 'EM MANUTENÇÃO') {
+                        dados.cell.styles.fillColor = [254, 243, 199];
+                        dados.cell.styles.textColor = [154, 52, 18];
+                        dados.cell.styles.fontStyle = 'bold';
+                    }
+                }
+            });
+
+            const totalPaginas = documento.internal.getNumberOfPages();
+            for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+                documento.setPage(pagina);
+                documento.setDrawColor(203, 213, 225);
+                documento.setLineWidth(0.2);
+                documento.line(margem, alturaPagina - 10, larguraPagina - margem, alturaPagina - 10);
+                documento.setFont('helvetica', 'normal');
+                documento.setFontSize(7);
+                documento.setTextColor(...cinzaTexto);
+                documento.text('Sistema de Controle de Estoque', margem, alturaPagina - 4);
+                documento.text(`Página ${pagina} de ${totalPaginas}`, larguraPagina - margem, alturaPagina - 4, {
+                    align: 'right'
+                });
+            }
+
+            const dataArquivo = new Date().toISOString().slice(0, 10);
+            documento.save(`Relatorio_Operacional_${dataArquivo}.pdf`);
+            setErroOperacionais('');
+            mostrarMensagem('Relatório PDF operacional exportado com sucesso.');
+        } catch (error) {
+            console.error('Erro ao exportar relatório operacional para PDF:', error);
+            setErroOperacionais('Erro ao exportar relatório operacional para PDF.');
+        }
+    };
+
     useEffect(() => {
         carregarEquipamentos();
         carregarManutencoes();
+        carregarQualificacoes();
+        carregarOperacionais();
     }, []);
 
     const handleFiltroChange = (evento) => {
         const { name, value } = evento.target;
 
         setFiltros((estadoAtual) => ({
+            ...estadoAtual,
+            [name]: value
+        }));
+    };
+
+    const handleFiltroOperacionaisChange = (evento) => {
+        const { name, value } = evento.target;
+
+        setFiltrosOperacionais((estadoAtual) => ({
             ...estadoAtual,
             [name]: value
         }));
@@ -398,34 +875,15 @@ function Relatorios() {
             },
 
             columnStyles: {
-                0: {
-                    cellWidth: 18,
-                    halign: 'center'
-                },
-                1: {
-                    cellWidth: 40
-                },
-                2: {
-                    cellWidth: 31
-                },
-                3: {
-                    cellWidth: 28
-                },
-                4: {
-                    cellWidth: 43
-                },
-                5: {
-                    cellWidth: 36,
-                    halign: 'center'
-                },
-                6: {
-                    cellWidth: 35,
-                    halign: 'center'
-                },
-                7: {
-                    cellWidth: 24,
-                    halign: 'center'
-                }
+                // Larguras ajustadas para ocupar a mesma largura útil do relatório de Qualificações.
+                0: { cellWidth: 18, halign: 'center' },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 31 },
+                3: { cellWidth: 28 },
+                4: { cellWidth: 43 },
+                5: { cellWidth: 36, halign: 'center' },
+                6: { cellWidth: 35, halign: 'center' },
+                7: { cellWidth: 36, halign: 'center' }
             },
 
             didParseCell: (dados) => {
@@ -766,18 +1224,31 @@ function Relatorios() {
             ]);
 
             /*
-             * Linha vazia
+             * Filtros aplicados
              */
 
+            const filtrosAplicados = [];
+
+            if (filtros.codigo?.trim()) filtrosAplicados.push(`Código: ${filtros.codigo.trim()}`);
+            if (filtros.nome?.trim()) filtrosAplicados.push(`Nome: ${filtros.nome.trim()}`);
+            if (filtros.fabricante?.trim()) filtrosAplicados.push(`Fabricante: ${filtros.fabricante.trim()}`);
+            if (filtros.localizacao?.trim()) filtrosAplicados.push(`Localização: ${filtros.localizacao.trim()}`);
+            if (filtros.status_qualificacao) filtrosAplicados.push(`Qualificação: ${filtros.status_qualificacao}`);
+            if (filtros.status_manutencao) filtrosAplicados.push(`Manutenção: ${filtros.status_manutencao}`);
+            if (filtros.ativo !== '') filtrosAplicados.push(`Situação: ${filtros.ativo === 'true' ? 'Ativos' : 'Inativos'}`);
+
             dados.push([
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula(''),
-                criarCelula('')
+                criarCelula(
+                    `Filtros aplicados: ${filtrosAplicados.length ? filtrosAplicados.join(' | ') : 'Todos os equipamentos'}`,
+                    estiloInformacao
+                ),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao),
+                criarCelula('', estiloInformacao)
             ]);
 
             /*
@@ -1004,6 +1475,10 @@ function Relatorios() {
                 {
                     s: { r: 3, c: 0 },
                     e: { r: 3, c: 7 }
+                },
+                {
+                    s: { r: 4, c: 0 },
+                    e: { r: 4, c: 7 }
                 }
             ];
 
@@ -1035,8 +1510,7 @@ function Relatorios() {
                 { hpt: 24 },
                 { hpt: 20 },
                 { hpt: 20 },
-                { hpt: 8 },
-                { hpt: 28 }
+                { hpt: 30 }
             ];
 
             /*
@@ -1048,7 +1522,7 @@ function Relatorios() {
             const ultimaLinha = dados.length;
 
             planilha['!autofilter'] = {
-                ref: `A6:H${ultimaLinha}`
+                ref: `A5:H${ultimaLinha}`
             };
 
             /*
@@ -1097,6 +1571,1434 @@ function Relatorios() {
             );
         }
     };
+
+
+
+    const exportarManutencoesExcel = () => {
+        if (manutencoes.length === 0) {
+            setErroManutencoes('Não há manutenções para exportar.');
+            return;
+        }
+
+        try {
+            const dataAtual = new Date();
+            const dataArquivo = dataAtual.toISOString().slice(0, 10);
+
+            const bordaPadrao = {
+                top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+            };
+
+            const estiloTitulo = {
+                font: {
+                    bold: true,
+                    sz: 18,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '111827' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const estiloSubtitulo = {
+                font: {
+                    bold: true,
+                    sz: 14,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '1F2937' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const estiloInformacao = {
+                font: {
+                    sz: 10,
+                    color: { rgb: '4B5563' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: 'F3F4F6' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                },
+                border: bordaPadrao
+            };
+
+            const estiloCabecalho = {
+                font: {
+                    bold: true,
+                    sz: 10,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '2563EB' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                },
+                border: bordaPadrao
+            };
+
+            const estiloCelula = {
+                font: {
+                    sz: 10,
+                    color: { rgb: '374151' }
+                },
+                alignment: {
+                    vertical: 'center'
+                },
+                border: bordaPadrao
+            };
+
+            const estiloStatusBase = {
+                ...estiloCelula,
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const linhas = manutencoes.map((manutencao) => {
+                let estiloStatus = estiloStatusBase;
+
+                if (manutencao.status === 'VENCIDA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '991B1B' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEE2E2' }
+                        }
+                    };
+                } else if (manutencao.status === 'PRÓXIMA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '92400E' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEF3C7' }
+                        }
+                    };
+                } else if (manutencao.status === 'EM DIA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '166534' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'DCFCE7' }
+                        }
+                    };
+                }
+
+                let estiloResultado = estiloCelula;
+
+                if (manutencao.resultado === 'APROVADO') {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '166534' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'DCFCE7' }
+                        }
+                    };
+                } else if (manutencao.resultado === 'REPROVADO') {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '991B1B' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEE2E2' }
+                        }
+                    };
+                } else if (
+                    manutencao.resultado === 'APROVADO_COM_RESTRICAO'
+                ) {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '92400E' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEF3C7' }
+                        }
+                    };
+                }
+
+                return [
+                    {
+                        v: manutencao.codigo || '-',
+                        t: 's',
+                        s: {
+                            ...estiloCelula,
+                            font: {
+                                bold: true,
+                                sz: 10,
+                                color: { rgb: '111827' }
+                            }
+                        }
+                    },
+                    {
+                        v: manutencao.nome || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: manutencao.tipo || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: formatarData(manutencao.data_manutencao),
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: formatarData(manutencao.proxima_manutencao),
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: manutencao.responsavel || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: manutencao.resultado === 'APROVADO_COM_RESTRICAO'
+                            ? 'Aprovado com restrição'
+                            : manutencao.resultado === 'APROVADO'
+                                ? 'Aprovado'
+                                : manutencao.resultado === 'REPROVADO'
+                                    ? 'Reprovado'
+                                    : manutencao.resultado || '-',
+                        t: 's',
+                        s: estiloResultado
+                    },
+                    {
+                        v: manutencao.status || '-',
+                        t: 's',
+                        s: estiloStatus
+                    }
+                ];
+            });
+
+            const dados = [
+                [
+                    {
+                        v: 'SISTEMA DE CONTROLE DE ESTOQUE',
+                        t: 's',
+                        s: estiloTitulo
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloTitulo
+                    }))
+                ],
+                [
+                    {
+                        v: 'RELATÓRIO DE MANUTENÇÕES',
+                        t: 's',
+                        s: estiloSubtitulo
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloSubtitulo
+                    }))
+                ],
+                [
+                    {
+                        v: `Gerado em: ${dataAtual.toLocaleDateString('pt-BR')} às ${dataAtual.toLocaleTimeString('pt-BR')}`,
+                        t: 's',
+                        s: estiloInformacao
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloInformacao
+                    }))
+                ],
+                [
+                    {
+                        v: `Total de manutenções: ${manutencoes.length}`,
+                        t: 's',
+                        s: estiloInformacao
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloInformacao
+                    }))
+                ],
+                [
+                    { v: 'Código', t: 's', s: estiloCabecalho },
+                    { v: 'Equipamento', t: 's', s: estiloCabecalho },
+                    { v: 'Tipo', t: 's', s: estiloCabecalho },
+                    { v: 'Data da manutenção', t: 's', s: estiloCabecalho },
+                    { v: 'Próxima manutenção', t: 's', s: estiloCabecalho },
+                    { v: 'Responsável', t: 's', s: estiloCabecalho },
+                    { v: 'Resultado', t: 's', s: estiloCabecalho },
+                    { v: 'Status', t: 's', s: estiloCabecalho }
+                ],
+                ...linhas
+            ];
+
+            const planilha = XLSX.utils.aoa_to_sheet(dados);
+
+            planilha['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }
+            ];
+
+            planilha['!cols'] = [
+                { wch: 14 },
+                { wch: 32 },
+                { wch: 18 },
+                { wch: 22 },
+                { wch: 22 },
+                { wch: 28 },
+                { wch: 30 },
+                { wch: 18 }
+            ];
+
+            planilha['!rows'] = [
+                { hpt: 30 },
+                { hpt: 24 },
+                { hpt: 22 },
+                { hpt: 22 },
+                { hpt: 30 },
+                ...manutencoes.map(() => ({ hpt: 22 }))
+            ];
+
+            planilha['!autofilter'] = {
+                ref: `A5:H${dados.length}`
+            };
+
+            const livro = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(
+                livro,
+                planilha,
+                'Manutenções'
+            );
+
+            XLSX.writeFile(
+                livro,
+                `Relatorio_Manutencoes_${dataArquivo}.xlsx`
+            );
+
+            setErroManutencoes('');
+            mostrarMensagem(
+                'Relatório Excel de manutenções exportado com sucesso.'
+            );
+        } catch (error) {
+            console.error(
+                'Erro ao exportar relatório de manutenções:',
+                error
+            );
+
+            setErroManutencoes(
+                'Erro ao exportar relatório de manutenções.'
+            );
+        }
+    };
+
+
+    const exportarQualificacoesExcel = () => {
+        if (qualificacoes.length === 0) {
+            setErroQualificacoes(
+                'Não há qualificações para exportar.'
+            );
+            return;
+        }
+
+        try {
+            const dataAtual = new Date();
+            const dataArquivo = dataAtual.toISOString().slice(0, 10);
+
+            const bordaPadrao = {
+                top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+            };
+
+            const estiloTitulo = {
+                font: {
+                    bold: true,
+                    sz: 18,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '111827' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const estiloSubtitulo = {
+                font: {
+                    bold: true,
+                    sz: 14,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '1F2937' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const estiloInformacao = {
+                font: {
+                    sz: 10,
+                    color: { rgb: '4B5563' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: 'F3F4F6' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                },
+                border: bordaPadrao
+            };
+
+            const estiloCabecalho = {
+                font: {
+                    bold: true,
+                    sz: 10,
+                    color: { rgb: 'FFFFFF' }
+                },
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '2563EB' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                },
+                border: bordaPadrao
+            };
+
+            const estiloCelula = {
+                font: {
+                    sz: 10,
+                    color: { rgb: '374151' }
+                },
+                alignment: {
+                    vertical: 'center'
+                },
+                border: bordaPadrao
+            };
+
+            const estiloStatusBase = {
+                ...estiloCelula,
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center'
+                }
+            };
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const formatarResultado = (resultado) => {
+                if (resultado === 'APROVADO_COM_RESTRICAO') {
+                    return 'Aprovado com restrição';
+                }
+
+                if (resultado === 'APROVADO') return 'Aprovado';
+                if (resultado === 'REPROVADO') return 'Reprovado';
+
+                return resultado || '-';
+            };
+
+            const linhas = qualificacoes.map((qualificacao) => {
+                let estiloResultado = estiloStatusBase;
+
+                if (qualificacao.resultado === 'APROVADO') {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '166534' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'DCFCE7' }
+                        }
+                    };
+                } else if (qualificacao.resultado === 'REPROVADO') {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '991B1B' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEE2E2' }
+                        }
+                    };
+                } else if (
+                    qualificacao.resultado === 'APROVADO_COM_RESTRICAO'
+                ) {
+                    estiloResultado = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '92400E' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEF3C7' }
+                        }
+                    };
+                }
+
+                let estiloStatus = estiloStatusBase;
+
+                if (qualificacao.status === 'VENCIDA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '991B1B' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEE2E2' }
+                        }
+                    };
+                } else if (qualificacao.status === 'PRÓXIMA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '92400E' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'FEF3C7' }
+                        }
+                    };
+                } else if (qualificacao.status === 'EM DIA') {
+                    estiloStatus = {
+                        ...estiloStatusBase,
+                        font: {
+                            bold: true,
+                            sz: 10,
+                            color: { rgb: '166534' }
+                        },
+                        fill: {
+                            patternType: 'solid',
+                            fgColor: { rgb: 'DCFCE7' }
+                        }
+                    };
+                }
+
+                return [
+                    {
+                        v: qualificacao.codigo || '-',
+                        t: 's',
+                        s: {
+                            ...estiloCelula,
+                            font: {
+                                bold: true,
+                                sz: 10,
+                                color: { rgb: '111827' }
+                            }
+                        }
+                    },
+                    {
+                        v: qualificacao.nome || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: qualificacao.tipo || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: formatarData(qualificacao.data_qualificacao),
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: formatarData(qualificacao.proxima_qualificacao),
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: qualificacao.responsavel || '-',
+                        t: 's',
+                        s: estiloCelula
+                    },
+                    {
+                        v: formatarResultado(qualificacao.resultado),
+                        t: 's',
+                        s: estiloResultado
+                    },
+                    {
+                        v: qualificacao.status || '-',
+                        t: 's',
+                        s: estiloStatus
+                    }
+                ];
+            });
+
+            const dados = [
+                [
+                    {
+                        v: 'SISTEMA DE CONTROLE DE ESTOQUE',
+                        t: 's',
+                        s: estiloTitulo
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloTitulo
+                    }))
+                ],
+                [
+                    {
+                        v: 'RELATÓRIO DE QUALIFICAÇÕES',
+                        t: 's',
+                        s: estiloSubtitulo
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloSubtitulo
+                    }))
+                ],
+                [
+                    {
+                        v: `Gerado em: ${dataAtual.toLocaleDateString('pt-BR')} às ${dataAtual.toLocaleTimeString('pt-BR')}`,
+                        t: 's',
+                        s: estiloInformacao
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloInformacao
+                    }))
+                ],
+                [
+                    {
+                        v: `Total de qualificações: ${qualificacoes.length}`,
+                        t: 's',
+                        s: estiloInformacao
+                    },
+                    ...Array.from({ length: 7 }, () => ({
+                        v: '',
+                        t: 's',
+                        s: estiloInformacao
+                    }))
+                ],
+                [
+                    { v: 'Código', t: 's', s: estiloCabecalho },
+                    { v: 'Equipamento', t: 's', s: estiloCabecalho },
+                    { v: 'Tipo', t: 's', s: estiloCabecalho },
+                    { v: 'Data da qualificação', t: 's', s: estiloCabecalho },
+                    { v: 'Próxima qualificação', t: 's', s: estiloCabecalho },
+                    { v: 'Responsável', t: 's', s: estiloCabecalho },
+                    { v: 'Resultado', t: 's', s: estiloCabecalho },
+                    { v: 'Status', t: 's', s: estiloCabecalho }
+                ],
+                ...linhas
+            ];
+
+            const planilha = XLSX.utils.aoa_to_sheet(dados);
+
+            planilha['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }
+            ];
+
+            planilha['!cols'] = [
+                { wch: 14 },
+                { wch: 32 },
+                { wch: 22 },
+                { wch: 24 },
+                { wch: 24 },
+                { wch: 28 },
+                { wch: 30 },
+                { wch: 22 }
+            ];
+
+            planilha['!rows'] = [
+                { hpt: 30 },
+                { hpt: 24 },
+                { hpt: 22 },
+                { hpt: 22 },
+                { hpt: 30 },
+                ...qualificacoes.map(() => ({ hpt: 22 }))
+            ];
+
+            planilha['!autofilter'] = {
+                ref: `A5:H${dados.length}`
+            };
+
+            const livro = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(
+                livro,
+                planilha,
+                'Qualificações'
+            );
+
+            XLSX.writeFile(
+                livro,
+                `Relatorio_Qualificacoes_${dataArquivo}.xlsx`
+            );
+
+            setErroQualificacoes('');
+            mostrarMensagem(
+                'Relatório Excel de qualificações exportado com sucesso.'
+            );
+        } catch (error) {
+            console.error(
+                'Erro ao exportar relatório de qualificações:',
+                error
+            );
+
+            setErroQualificacoes(
+                'Erro ao exportar relatório Excel de qualificações.'
+            );
+        }
+    };
+
+
+    const exportarQualificacoesPDF = () => {
+        if (qualificacoes.length === 0) {
+            setErroQualificacoes('Não há qualificações para exportar.');
+            return;
+        }
+
+        try {
+            const documento = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const margem = 14;
+            const larguraPagina = documento.internal.pageSize.getWidth();
+            const alturaPagina = documento.internal.pageSize.getHeight();
+            const larguraConteudo = larguraPagina - margem * 2;
+
+            const azulEscuro = [17, 24, 39];
+            const azulCabecalho = [37, 99, 235];
+            const cinzaTexto = [71, 85, 105];
+            const branco = [255, 255, 255];
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const formatarResultado = (resultado) => {
+                if (resultado === 'APROVADO_COM_RESTRICAO') {
+                    return 'Aprovado com restrição';
+                }
+
+                if (resultado === 'APROVADO') return 'Aprovado';
+                if (resultado === 'REPROVADO') return 'Reprovado';
+
+                return resultado || '-';
+            };
+
+            const filtrosAplicados = [];
+
+            if (filtrosQualificacoes.codigo?.trim()) {
+                filtrosAplicados.push(
+                    `Código: ${filtrosQualificacoes.codigo.trim()}`
+                );
+            }
+
+            if (filtrosQualificacoes.nome?.trim()) {
+                filtrosAplicados.push(
+                    `Equipamento: ${filtrosQualificacoes.nome.trim()}`
+                );
+            }
+
+            if (filtrosQualificacoes.tipo) {
+                filtrosAplicados.push(
+                    `Tipo: ${filtrosQualificacoes.tipo}`
+                );
+            }
+
+            if (filtrosQualificacoes.responsavel?.trim()) {
+                filtrosAplicados.push(
+                    `Responsável: ${filtrosQualificacoes.responsavel.trim()}`
+                );
+            }
+
+            if (filtrosQualificacoes.resultado) {
+                filtrosAplicados.push(
+                    `Resultado: ${formatarResultado(filtrosQualificacoes.resultado)}`
+                );
+            }
+
+            if (filtrosQualificacoes.data_qualificacao) {
+                filtrosAplicados.push(
+                    `Data da qualificação: ${formatarData(filtrosQualificacoes.data_qualificacao)}`
+                );
+            }
+
+            if (filtrosQualificacoes.proxima_qualificacao) {
+                filtrosAplicados.push(
+                    `Próxima qualificação: ${formatarData(filtrosQualificacoes.proxima_qualificacao)}`
+                );
+            }
+
+            if (filtrosQualificacoes.status) {
+                filtrosAplicados.push(
+                    `Status: ${filtrosQualificacoes.status}`
+                );
+            }
+
+            // Cabeçalho
+            documento.setFillColor(...azulEscuro);
+            documento.rect(margem, 10, larguraConteudo, 23, 'F');
+
+            documento.setTextColor(...branco);
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(16);
+
+            documento.text(
+                'SISTEMA DE CONTROLE DE ESTOQUE',
+                larguraPagina / 2,
+                19,
+                { align: 'center' }
+            );
+
+            documento.setFontSize(12);
+
+            documento.text(
+                'RELATÓRIO DE QUALIFICAÇÕES',
+                larguraPagina / 2,
+                27,
+                { align: 'center' }
+            );
+
+            // Data e total
+            documento.setTextColor(...cinzaTexto);
+            documento.setFont('helvetica', 'normal');
+            documento.setFontSize(8.5);
+
+            documento.text(
+                `Gerado em: ${new Date().toLocaleString('pt-BR')}`,
+                margem,
+                40
+            );
+
+            documento.text(
+                `Total de qualificações: ${qualificacoes.length}`,
+                larguraPagina - margem,
+                40,
+                { align: 'right' }
+            );
+
+            // Filtros aplicados
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(8.5);
+            documento.setTextColor(...azulEscuro);
+
+            documento.text('Filtros aplicados:', margem, 48);
+
+            documento.setFont('helvetica', 'normal');
+            documento.setTextColor(...cinzaTexto);
+
+            const textoFiltros = filtrosAplicados.length > 0
+                ? filtrosAplicados.join(' | ')
+                : 'Todas as qualificações';
+
+            const linhasFiltros = documento.splitTextToSize(
+                textoFiltros,
+                larguraConteudo - 35
+            );
+
+            documento.text(linhasFiltros, margem + 30, 48);
+
+            const inicioTabela =
+                51 + Math.max(0, (linhasFiltros.length - 1) * 4);
+
+            // Dados da tabela
+            const cabecalho = [
+                'Código',
+                'Equipamento',
+                'Tipo',
+                'Data da qualificação',
+                'Próxima qualificação',
+                'Responsável',
+                'Resultado',
+                'Status'
+            ];
+
+            const linhas = qualificacoes.map((qualificacao) => [
+                qualificacao.codigo || '-',
+                qualificacao.nome || '-',
+                qualificacao.tipo || '-',
+                formatarData(qualificacao.data_qualificacao),
+                formatarData(qualificacao.proxima_qualificacao),
+                qualificacao.responsavel || '-',
+                formatarResultado(qualificacao.resultado),
+                qualificacao.status || '-'
+            ]);
+
+            autoTable(documento, {
+                head: [cabecalho],
+                body: linhas,
+                startY: inicioTabela,
+                margin: {
+                    left: margem,
+                    right: margem,
+                    bottom: 14
+                },
+                theme: 'grid',
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 7,
+                    textColor: [30, 41, 59],
+                    cellPadding: 2,
+                    lineColor: [203, 213, 225],
+                    lineWidth: 0.2,
+                    valign: 'middle',
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: azulCabecalho,
+                    textColor: branco,
+                    fontStyle: 'bold',
+                    fontSize: 7,
+                    halign: 'center',
+                    valign: 'middle',
+                    cellPadding: 2
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252]
+                },
+                columnStyles: {
+                    0: { cellWidth: 18, halign: 'center' },
+                    1: { cellWidth: 44 },
+                    2: { cellWidth: 28, halign: 'center' },
+                    3: { cellWidth: 32, halign: 'center' },
+                    4: { cellWidth: 32, halign: 'center' },
+                    5: { cellWidth: 39 },
+                    6: { cellWidth: 50, halign: 'center' },
+                    7: { cellWidth: 24, halign: 'center' }
+                },
+                didParseCell: (dados) => {
+                    if (dados.section !== 'body') return;
+
+                    const valor = String(
+                        dados.cell.raw || ''
+                    ).toUpperCase();
+
+                    const coluna = dados.column.index;
+
+                    // Resultado da qualificação
+                    if (coluna === 6) {
+                        if (valor === 'APROVADO') {
+                            dados.cell.styles.fillColor = [220, 252, 231];
+                            dados.cell.styles.textColor = [22, 101, 52];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'REPROVADO') {
+                            dados.cell.styles.fillColor = [254, 226, 226];
+                            dados.cell.styles.textColor = [153, 27, 27];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'APROVADO COM RESTRIÇÃO') {
+                            dados.cell.styles.fillColor = [254, 249, 195];
+                            dados.cell.styles.textColor = [133, 77, 14];
+                            dados.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+
+                    // Status da qualificação
+                    if (coluna === 7) {
+                        if (valor === 'VENCIDA') {
+                            dados.cell.styles.fillColor = [254, 226, 226];
+                            dados.cell.styles.textColor = [185, 28, 28];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'PRÓXIMA') {
+                            dados.cell.styles.fillColor = [254, 243, 199];
+                            dados.cell.styles.textColor = [146, 64, 14];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'EM DIA') {
+                            dados.cell.styles.fillColor = [220, 252, 231];
+                            dados.cell.styles.textColor = [22, 101, 52];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'SEM AGENDAMENTO') {
+                            dados.cell.styles.fillColor = [226, 232, 240];
+                            dados.cell.styles.textColor = [71, 85, 105];
+                            dados.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
+            });
+
+            // Rodapé e paginação
+            const totalPaginas = documento.internal.getNumberOfPages();
+
+            for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+                documento.setPage(pagina);
+
+                documento.setDrawColor(203, 213, 225);
+                documento.setLineWidth(0.2);
+
+                documento.line(
+                    margem,
+                    alturaPagina - 10,
+                    larguraPagina - margem,
+                    alturaPagina - 10
+                );
+
+                documento.setFont('helvetica', 'normal');
+                documento.setFontSize(7);
+                documento.setTextColor(...cinzaTexto);
+
+                documento.text(
+                    'Sistema de Controle de Estoque',
+                    margem,
+                    alturaPagina - 4
+                );
+
+                documento.text(
+                    `Página ${pagina} de ${totalPaginas}`,
+                    larguraPagina - margem,
+                    alturaPagina - 4,
+                    { align: 'right' }
+                );
+            }
+
+            const dataArquivo = new Date().toISOString().slice(0, 10);
+
+            documento.save(
+                `Relatorio_Qualificacoes_${dataArquivo}.pdf`
+            );
+
+            setErroQualificacoes('');
+            mostrarMensagem(
+                'Relatório PDF de qualificações exportado com sucesso.'
+            );
+        } catch (error) {
+            console.error(
+                'Erro ao exportar relatório PDF de qualificações:',
+                error
+            );
+
+            setErroQualificacoes(
+                'Erro ao exportar relatório PDF de qualificações.'
+            );
+        }
+    };
+
+
+
+    const exportarManutencoesPDF = () => {
+        if (manutencoes.length === 0) {
+            setErroManutencoes('Não há manutenções para exportar.');
+            return;
+        }
+
+        try {
+            const documento = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const margem = 14;
+            const larguraPagina = documento.internal.pageSize.getWidth();
+            const alturaPagina = documento.internal.pageSize.getHeight();
+            const larguraConteudo = larguraPagina - margem * 2;
+
+            const azulEscuro = [17, 24, 39];
+            const azulCabecalho = [37, 99, 235];
+            const cinzaTexto = [71, 85, 105];
+            const branco = [255, 255, 255];
+
+            const formatarData = (data) => {
+                if (!data) return '-';
+
+                return new Date(data).toLocaleDateString('pt-BR', {
+                    timeZone: 'UTC'
+                });
+            };
+
+            const formatarResultado = (resultado) => {
+                if (resultado === 'APROVADO_COM_RESTRICAO') {
+                    return 'Aprovado com restrição';
+                }
+
+                if (resultado === 'APROVADO') return 'Aprovado';
+                if (resultado === 'REPROVADO') return 'Reprovado';
+
+                return resultado || '-';
+            };
+
+            // Filtros aplicados
+            const filtrosAplicados = [];
+
+            if (filtrosManutencoes.codigo?.trim()) {
+                filtrosAplicados.push(
+                    `Código: ${filtrosManutencoes.codigo.trim()}`
+                );
+            }
+
+            if (filtrosManutencoes.nome?.trim()) {
+                filtrosAplicados.push(
+                    `Equipamento: ${filtrosManutencoes.nome.trim()}`
+                );
+            }
+
+            if (filtrosManutencoes.tipo) {
+                filtrosAplicados.push(`Tipo: ${filtrosManutencoes.tipo}`);
+            }
+
+            if (filtrosManutencoes.responsavel?.trim()) {
+                filtrosAplicados.push(
+                    `Responsável: ${filtrosManutencoes.responsavel.trim()}`
+                );
+            }
+
+            if (filtrosManutencoes.resultado) {
+                filtrosAplicados.push(
+                    `Resultado: ${formatarResultado(filtrosManutencoes.resultado)}`
+                );
+            }
+
+            if (filtrosManutencoes.data_manutencao) {
+                filtrosAplicados.push(
+                    `Data da manutenção: ${formatarData(filtrosManutencoes.data_manutencao)}`
+                );
+            }
+
+            if (filtrosManutencoes.proxima_manutencao) {
+                filtrosAplicados.push(
+                    `Próxima manutenção: ${formatarData(filtrosManutencoes.proxima_manutencao)}`
+                );
+            }
+
+            if (filtrosManutencoes.status) {
+                filtrosAplicados.push(
+                    `Status: ${filtrosManutencoes.status}`
+                );
+            }
+
+            // Cabeçalho no padrão do relatório de Equipamentos
+            documento.setFillColor(...azulEscuro);
+            documento.rect(margem, 10, larguraConteudo, 23, 'F');
+
+            documento.setTextColor(...branco);
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(16);
+
+            documento.text(
+                'SISTEMA DE CONTROLE DE ESTOQUE',
+                larguraPagina / 2,
+                19,
+                { align: 'center' }
+            );
+
+            documento.setFontSize(12);
+
+            documento.text(
+                'RELATÓRIO DE MANUTENÇÕES',
+                larguraPagina / 2,
+                27,
+                { align: 'center' }
+            );
+
+            // Data e total
+            documento.setTextColor(...cinzaTexto);
+            documento.setFont('helvetica', 'normal');
+            documento.setFontSize(8.5);
+
+            documento.text(
+                `Gerado em: ${new Date().toLocaleString('pt-BR')}`,
+                margem,
+                40
+            );
+
+            documento.text(
+                `Total de manutenções: ${manutencoes.length}`,
+                larguraPagina - margem,
+                40,
+                { align: 'right' }
+            );
+
+            // Filtros antes da tabela
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(8.5);
+            documento.setTextColor(...azulEscuro);
+
+            documento.text('Filtros aplicados:', margem, 48);
+
+            documento.setFont('helvetica', 'normal');
+            documento.setTextColor(...cinzaTexto);
+
+            const textoFiltros = filtrosAplicados.length > 0
+                ? filtrosAplicados.join(' | ')
+                : 'Todas as manutenções';
+
+            const linhasFiltros = documento.splitTextToSize(
+                textoFiltros,
+                larguraConteudo - 35
+            );
+
+            documento.text(linhasFiltros, margem + 30, 48);
+
+            const inicioTabela =
+                51 + Math.max(0, (linhasFiltros.length - 1) * 4);
+
+            // Dados da tabela
+            const cabecalho = [
+                'Código',
+                'Equipamento',
+                'Tipo',
+                'Data da manutenção',
+                'Próxima manutenção',
+                'Responsável',
+                'Resultado',
+                'Status'
+            ];
+
+            const linhas = manutencoes.map((manutencao) => [
+                manutencao.codigo || '-',
+                manutencao.nome || '-',
+                manutencao.tipo || '-',
+                formatarData(manutencao.data_manutencao),
+                formatarData(manutencao.proxima_manutencao),
+                manutencao.responsavel || '-',
+                formatarResultado(manutencao.resultado),
+                manutencao.status || '-'
+            ]);
+
+            autoTable(documento, {
+                head: [cabecalho],
+                body: linhas,
+                startY: inicioTabela,
+                margin: {
+                    left: margem,
+                    right: margem,
+                    bottom: 14
+                },
+                theme: 'grid',
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 7,
+                    textColor: [30, 41, 59],
+                    cellPadding: 2,
+                    lineColor: [203, 213, 225],
+                    lineWidth: 0.2,
+                    valign: 'middle',
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: azulCabecalho,
+                    textColor: branco,
+                    fontStyle: 'bold',
+                    fontSize: 7,
+                    halign: 'center',
+                    valign: 'middle',
+                    cellPadding: 2
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252]
+                },
+                // A soma das larguras é 267 mm.
+                // A largura disponível entre as margens é 269 mm.
+                columnStyles: {
+                    0: { cellWidth: 18, halign: 'center' },
+                    1: { cellWidth: 44 },
+                    2: { cellWidth: 28, halign: 'center' },
+                    3: { cellWidth: 32, halign: 'center' },
+                    4: { cellWidth: 32, halign: 'center' },
+                    5: { cellWidth: 39 },
+                    6: { cellWidth: 50, halign: 'center' },
+                    7: { cellWidth: 24, halign: 'center' }
+                },
+                didParseCell: (dados) => {
+                    if (dados.section !== 'body') return;
+
+                    const valor = String(
+                        dados.cell.raw || ''
+                    ).toUpperCase();
+
+                    const coluna = dados.column.index;
+
+                    // Resultado da manutenção
+                    if (coluna === 6) {
+                        if (valor === 'APROVADO') {
+                            dados.cell.styles.fillColor = [220, 252, 231];
+                            dados.cell.styles.textColor = [22, 101, 52];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'REPROVADO') {
+                            dados.cell.styles.fillColor = [254, 226, 226];
+                            dados.cell.styles.textColor = [153, 27, 27];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'APROVADO COM RESTRIÇÃO') {
+                            dados.cell.styles.fillColor = [254, 249, 195];
+                            dados.cell.styles.textColor = [133, 77, 14];
+                            dados.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+
+                    // Status da manutenção
+                    if (coluna === 7) {
+                        if (valor === 'VENCIDA') {
+                            dados.cell.styles.fillColor = [254, 226, 226];
+                            dados.cell.styles.textColor = [185, 28, 28];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'PRÓXIMA') {
+                            dados.cell.styles.fillColor = [254, 243, 199];
+                            dados.cell.styles.textColor = [146, 64, 14];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (valor === 'EM DIA') {
+                            dados.cell.styles.fillColor = [220, 252, 231];
+                            dados.cell.styles.textColor = [22, 101, 52];
+                            dados.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
+            });
+
+            // Rodapé e paginação
+            const totalPaginas = documento.internal.getNumberOfPages();
+
+            for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+                documento.setPage(pagina);
+
+                documento.setDrawColor(203, 213, 225);
+                documento.setLineWidth(0.2);
+
+                documento.line(
+                    margem,
+                    alturaPagina - 10,
+                    larguraPagina - margem,
+                    alturaPagina - 10
+                );
+
+                documento.setFont('helvetica', 'normal');
+                documento.setFontSize(7);
+                documento.setTextColor(...cinzaTexto);
+
+                documento.text(
+                    'Sistema de Controle de Estoque',
+                    margem,
+                    alturaPagina - 4
+                );
+
+                documento.text(
+                    `Página ${pagina} de ${totalPaginas}`,
+                    larguraPagina - margem,
+                    alturaPagina - 4,
+                    { align: 'right' }
+                );
+            }
+
+            const dataArquivo = new Date().toISOString().slice(0, 10);
+
+            documento.save(
+                `Relatorio_Manutencoes_${dataArquivo}.pdf`
+            );
+
+            setErroManutencoes('');
+            mostrarMensagem(
+                'Relatório PDF de manutenções exportado com sucesso.'
+            );
+        } catch (error) {
+            console.error(
+                'Erro ao exportar relatório PDF de manutenções:',
+                error
+            );
+
+            setErroManutencoes(
+                'Erro ao exportar relatório PDF de manutenções.'
+            );
+        }
+    };
+
+
 
     const handleGerarRelatorio = async (evento) => {
         evento.preventDefault();
@@ -1162,6 +3064,7 @@ function Relatorios() {
 
                 {paineisAbertos.equipamentos && (
                     <div className="relatorio-painel-conteudo">
+
                         <form
                             className="relatorio-filtros"
                             onSubmit={handleGerarRelatorio}
@@ -1264,6 +3167,7 @@ function Relatorios() {
                                 </select>
                             </div>
 
+
                             <div className="relatorio-acoes">
                                 <button
                                     type="button"
@@ -1281,8 +3185,11 @@ function Relatorios() {
                                 >
                                     {carregando ? 'Carregando...' : 'Gerar relatório'}
                                 </button>
+
                             </div>
+
                         </form>
+
 
                         {erro && (
                             <div className="mensagem-relatorio mensagem-erro">
@@ -1399,6 +3306,7 @@ function Relatorios() {
 
                 {paineisAbertos.manutencoes && (
                     <div className="relatorio-painel-conteudo">
+
                         <form
                             className="relatorio-filtros"
                             onSubmit={(event) => {
@@ -1591,6 +3499,45 @@ function Relatorios() {
                             </div>
                         </form>
 
+
+                        <div className="relatorio-resultado-header">
+                            <div>
+                                <h3>Resultado</h3>
+                                <p>
+                                    {manutencoes.length} manutenção(ões) encontrada(s).
+                                </p>
+                            </div>
+
+                            <div className="relatorios-exportacoes">
+
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-excel"
+                                    onClick={exportarManutencoesExcel}
+                                    disabled={
+                                        carregandoManutencoes ||
+                                        manutencoes.length === 0
+                                    }
+                                >
+                                    Exportar Excel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-pdf"
+                                    onClick={exportarManutencoesPDF}
+                                    disabled={
+                                        carregandoManutencoes ||
+                                        manutencoes.length === 0
+                                    }
+                                >
+                                    Exportar PDF
+                                </button>
+
+                            </div>
+                        </div>
+
+
                         {erroManutencoes && (
                             <div className="mensagem-relatorio mensagem-erro">
                                 {erroManutencoes}
@@ -1663,6 +3610,691 @@ function Relatorios() {
                 )}
             </section>
 
+
+            <section className="relatorio-card relatorio-painel">
+                <button
+                    type="button"
+                    className="relatorio-painel-cabecalho"
+                    onClick={() => alternarPainel('qualificacoes')}
+                    aria-expanded={paineisAbertos.qualificacoes}
+                >
+                    <span className="relatorio-painel-titulo">
+                        <h3>Relatório de Qualificações</h3>
+                        <p>
+                            {qualificacoes.length} qualificação(ões) encontrada(s).
+                        </p>
+                    </span>
+
+                    <span
+                        className={`relatorio-painel-icone ${paineisAbertos.qualificacoes ? 'aberto' : ''
+                            }`}
+                        aria-hidden="true"
+                    >
+                        ›
+                    </span>
+                </button>
+
+                {paineisAbertos.qualificacoes && (
+                    <div className="relatorio-painel-conteudo">
+                        <form
+                            className="relatorio-filtros"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                carregarQualificacoes(filtrosQualificacoes);
+                            }}
+                        >
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_codigo">
+                                    Código do equipamento
+                                </label>
+                                <input
+                                    id="qualificacao_codigo"
+                                    type="text"
+                                    value={filtrosQualificacoes.codigo}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            codigo: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Ex.: EQ-001"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_nome">
+                                    Nome do equipamento
+                                </label>
+                                <input
+                                    id="qualificacao_nome"
+                                    type="text"
+                                    value={filtrosQualificacoes.nome}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            nome: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Nome do equipamento"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_tipo">
+                                    Tipo de qualificação
+                                </label>
+                                <select
+                                    id="qualificacao_tipo"
+                                    value={filtrosQualificacoes.tipo}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            tipo: event.target.value
+                                        }))
+                                    }
+                                >
+                                    <option value="">Todos</option>
+                                    <option value="INSTALACAO">Instalação</option>
+                                    <option value="OPERACAO">Operação</option>
+                                    <option value="DESEMPENHO">Desempenho</option>
+                                    <option value="REQUALIFICACAO">Requalificação</option>
+                                    <option value="OUTRA">Outra</option>
+                                </select>
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_responsavel">
+                                    Responsável
+                                </label>
+                                <input
+                                    id="qualificacao_responsavel"
+                                    type="text"
+                                    value={filtrosQualificacoes.responsavel}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            responsavel: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Nome do responsável"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_resultado">
+                                    Resultado
+                                </label>
+                                <select
+                                    id="qualificacao_resultado"
+                                    value={filtrosQualificacoes.resultado}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            resultado: event.target.value
+                                        }))
+                                    }
+                                >
+                                    <option value="">Todos</option>
+                                    <option value="APROVADO">Aprovado</option>
+                                    <option value="APROVADO_COM_RESTRICAO">
+                                        Aprovado com restrição
+                                    </option>
+                                    <option value="REPROVADO">Reprovado</option>
+                                </select>
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_data">
+                                    Data da qualificação
+                                </label>
+                                <input
+                                    id="qualificacao_data"
+                                    type="date"
+                                    value={filtrosQualificacoes.data_qualificacao}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            data_qualificacao: event.target.value
+                                        }))
+                                    }
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_proxima">
+                                    Próxima qualificação
+                                </label>
+                                <input
+                                    id="qualificacao_proxima"
+                                    type="date"
+                                    value={filtrosQualificacoes.proxima_qualificacao}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            proxima_qualificacao: event.target.value
+                                        }))
+                                    }
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="qualificacao_status">Status</label>
+                                <select
+                                    id="qualificacao_status"
+                                    value={filtrosQualificacoes.status}
+                                    onChange={(event) =>
+                                        setFiltrosQualificacoes((anterior) => ({
+                                            ...anterior,
+                                            status: event.target.value
+                                        }))
+                                    }
+                                >
+                                    <option value="">Todos</option>
+                                    <option value="VENCIDA">Vencida</option>
+                                    <option value="PRÓXIMA">Próxima</option>
+                                    <option value="EM DIA">Em dia</option>
+                                    <option value="SEM AGENDAMENTO">
+                                        Sem agendamento
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div className="relatorio-acoes">
+                                <button
+                                    type="button"
+                                    className="botao-relatorio botao-secundario"
+                                    onClick={() => {
+                                        const filtrosLimpos = {
+                                            codigo: '',
+                                            nome: '',
+                                            tipo: '',
+                                            responsavel: '',
+                                            resultado: '',
+                                            data_qualificacao: '',
+                                            proxima_qualificacao: '',
+                                            status: ''
+                                        };
+
+                                        setFiltrosQualificacoes(filtrosLimpos);
+                                        carregarQualificacoes(filtrosLimpos);
+                                    }}
+                                    disabled={carregandoQualificacoes}
+                                >
+                                    Limpar filtros
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="botao-relatorio botao-principal"
+                                    disabled={carregandoQualificacoes}
+                                >
+                                    {carregandoQualificacoes
+                                        ? 'Carregando...'
+                                        : 'Gerar relatório'}
+                                </button>
+                            </div>
+                        </form>
+
+
+                        <div className="relatorio-resultado-header">
+                            <div>
+                                <h3>Resultado</h3>
+                                <p>
+                                    {qualificacoes.length} qualificação(ões) encontrada(s).
+                                </p>
+                            </div>
+
+                            <div className="relatorios-exportacoes">
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-excel"
+                                    onClick={exportarQualificacoesExcel}
+                                    disabled={
+                                        carregandoQualificacoes ||
+                                        qualificacoes.length === 0
+                                    }
+                                >
+                                    Exportar Excel
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-pdf"
+                                    onClick={exportarQualificacoesPDF}
+                                    disabled={
+                                        carregandoQualificacoes ||
+                                        qualificacoes.length === 0
+                                    }
+                                >
+                                    Exportar PDF
+                                </button>
+
+
+                            </div>
+                        </div>
+
+
+                        {erroQualificacoes && (
+                            <div className="mensagem-relatorio mensagem-erro">
+                                {erroQualificacoes}
+                            </div>
+                        )}
+
+                        {carregandoQualificacoes ? (
+                            <div className="relatorio-vazio">
+                                Carregando qualificações...
+                            </div>
+                        ) : qualificacoes.length === 0 ? (
+                            <div className="relatorio-vazio">
+                                Nenhuma qualificação encontrada.
+                            </div>
+                        ) : (
+                            <div className="relatorio-tabela-container">
+                                <table className="relatorio-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Equipamento</th>
+                                            <th>Tipo</th>
+                                            <th>Data da qualificação</th>
+                                            <th>Próxima qualificação</th>
+                                            <th>Responsável</th>
+                                            <th>Resultado</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {qualificacoes.map((qualificacao) => (
+                                            <tr key={qualificacao.id}>
+                                                <td>{qualificacao.codigo}</td>
+                                                <td>{qualificacao.nome}</td>
+                                                <td>{qualificacao.tipo}</td>
+                                                <td>
+                                                    {qualificacao.data_qualificacao
+                                                        ? new Date(
+                                                            qualificacao.data_qualificacao
+                                                        ).toLocaleDateString('pt-BR', {
+                                                            timeZone: 'UTC'
+                                                        })
+                                                        : '-'}
+                                                </td>
+                                                <td>
+                                                    {qualificacao.proxima_qualificacao
+                                                        ? new Date(
+                                                            qualificacao.proxima_qualificacao
+                                                        ).toLocaleDateString('pt-BR', {
+                                                            timeZone: 'UTC'
+                                                        })
+                                                        : '-'}
+                                                </td>
+                                                <td>
+                                                    {qualificacao.responsavel || '-'}
+                                                </td>
+                                                <td>
+                                                    {qualificacao.resultado ===
+                                                        'APROVADO_COM_RESTRICAO'
+                                                        ? 'Aprovado com restrição'
+                                                        : qualificacao.resultado || '-'}
+                                                </td>
+                                                <td>{qualificacao.status || '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </section>
+
+
+            <section className="relatorio-card relatorio-painel">
+                <button
+                    type="button"
+                    className="relatorio-painel-cabecalho"
+                    onClick={() => alternarPainel('operacional')}
+                    aria-expanded={paineisAbertos.operacional}
+                >
+                    <span className="relatorio-painel-titulo">
+                        <h3>Relatório Operacional</h3>
+                        <p>
+                            Consulte os registros operacionais dos equipamentos.
+                        </p>
+                    </span>
+
+                    <span
+                        className={`relatorio-painel-icone ${paineisAbertos.operacional ? 'aberto' : ''
+                            }`}
+                        aria-hidden="true"
+                    >
+                        ›
+                    </span>
+                </button>
+
+                {paineisAbertos.operacional && (
+                    <div className="relatorio-painel-conteudo">
+
+                        <form
+                            className="relatorio-filtros"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                carregarOperacionais(filtrosOperacionais);
+                            }}
+                        >
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_codigo">
+                                    Código do equipamento
+                                </label>
+                                <input
+                                    id="operacional_codigo"
+                                    type="text"
+                                    value={filtrosOperacionais.codigo}
+                                    onChange={(event) =>
+                                        setFiltrosOperacionais((anterior) => ({
+                                            ...anterior,
+                                            codigo: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Ex.: EQ-001"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_nome">
+                                    Nome do equipamento
+                                </label>
+                                <input
+                                    id="operacional_nome"
+                                    type="text"
+                                    value={filtrosOperacionais.nome}
+                                    onChange={(event) =>
+                                        setFiltrosOperacionais((anterior) => ({
+                                            ...anterior,
+                                            nome: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Nome do equipamento"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_modelo">Modelo</label>
+                                <input
+                                    id="operacional_modelo"
+                                    type="text"
+                                    value={filtrosOperacionais.modelo}
+                                    onChange={(event) =>
+                                        setFiltrosOperacionais((anterior) => ({
+                                            ...anterior,
+                                            modelo: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Modelo do equipamento"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_patrimonio">
+                                    Número de patrimônio
+                                </label>
+                                <input
+                                    id="operacional_patrimonio"
+                                    type="text"
+                                    value={filtrosOperacionais.numero_patrimonio_fase}
+                                    onChange={(event) =>
+                                        setFiltrosOperacionais((anterior) => ({
+                                            ...anterior,
+                                            numero_patrimonio_fase: event.target.value
+                                        }))
+                                    }
+                                    placeholder="Número de patrimônio"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_anvisa">Registro ANVISA</label>
+                                <input
+                                    id="operacional_anvisa"
+                                    type="text"
+                                    value={filtrosOperacionais.registro_anvisa_ms}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        registro_anvisa_ms: event.target.value
+                                    }))}
+                                    placeholder="Registro ANVISA"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_unidade">Unidade</label>
+                                <input
+                                    id="operacional_unidade"
+                                    type="text"
+                                    value={filtrosOperacionais.unidade}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        unidade: event.target.value
+                                    }))}
+                                    placeholder="Nome da unidade"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_sala">Sala</label>
+                                <input
+                                    id="operacional_sala"
+                                    type="text"
+                                    value={filtrosOperacionais.sala}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        sala: event.target.value
+                                    }))}
+                                    placeholder="Nome ou número da sala"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_data_aquisicao">Data de aquisição</label>
+                                <input
+                                    id="operacional_data_aquisicao"
+                                    type="date"
+                                    value={filtrosOperacionais.data_aquisicao}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        data_aquisicao: event.target.value
+                                    }))}
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_status">Status operacional</label>
+                                <select
+                                    id="operacional_status"
+                                    value={filtrosOperacionais.status_operacional}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        status_operacional: event.target.value
+                                    }))}
+                                >
+                                    <option value="">Todos</option>
+                                    <option value="ATIVO">Ativo</option>
+                                    <option value="INATIVO">Inativo</option>
+                                    <option value="EM MANUTENÇÃO">Em manutenção</option>
+                                </select>
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_manutencao_interna">Frequência de manutenção interna</label>
+                                <input
+                                    id="operacional_manutencao_interna"
+                                    type="text"
+                                    value={filtrosOperacionais.frequencia_manutencao_interna}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        frequencia_manutencao_interna: event.target.value
+                                    }))}
+                                    placeholder="Ex.: Mensal"
+                                />
+                            </div>
+
+                            <div className="campo-relatorio">
+                                <label htmlFor="operacional_manutencao_externa">Frequência de manutenção externa</label>
+                                <input
+                                    id="operacional_manutencao_externa"
+                                    type="text"
+                                    value={filtrosOperacionais.frequencia_manutencao_externa}
+                                    onChange={(event) => setFiltrosOperacionais((anterior) => ({
+                                        ...anterior,
+                                        frequencia_manutencao_externa: event.target.value
+                                    }))}
+                                    placeholder="Ex.: Anual"
+                                />
+                            </div>
+
+                            <div className="relatorio-acoes">
+
+
+                                <button
+                                    type="button"
+                                    className="botao-relatorio"
+                                    onClick={() => {
+                                        const filtrosLimpos = {
+                                            codigo: '',
+                                            nome: '',
+                                            modelo: '',
+                                            numero_patrimonio_fase: '',
+                                            registro_anvisa_ms: '',
+                                            unidade: '',
+                                            sala: '',
+                                            data_aquisicao: '',
+                                            status_operacional: '',
+                                            frequencia_manutencao_interna: '',
+                                            frequencia_manutencao_externa: ''
+                                        };
+
+                                        setFiltrosOperacionais(filtrosLimpos);
+                                        carregarOperacionais(filtrosLimpos);
+                                    }}
+                                    disabled={carregandoOperacionais}
+                                >
+                                    Limpar filtros
+                                </button>
+
+
+                                <button
+                                    type="submit"
+                                    className="botao-relatorio botao-principal"
+                                    disabled={carregandoOperacionais}
+                                >
+                                    {carregandoOperacionais
+                                        ? 'Carregando...'
+                                        : 'Gerar relatório'}
+                                </button>
+
+
+                            </div>
+                        </form>
+
+                        <div className="relatorio-resultado-header">
+                            <div>
+                                <h3>Resultado operacional</h3>
+                                <p>
+                                    {operacionais.length} registro(s) encontrado(s).
+                                </p>
+                            </div>
+
+                            <div className="relatorios-exportacoes">
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-excel"
+                                    onClick={exportarOperacionaisExcel}
+                                    disabled={
+                                        carregandoOperacionais ||
+                                        operacionais.length === 0
+                                    }
+                                >
+                                    Exportar Excel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-pdf"
+                                    onClick={exportarOperacionaisPDF}
+                                    disabled={
+                                        carregandoOperacionais ||
+                                        operacionais.length === 0
+                                    }
+                                >
+                                    Exportar PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        {erroOperacionais && (
+                            <div className="mensagem-relatorio mensagem-erro">
+                                {erroOperacionais}
+                            </div>
+                        )}
+
+                        {carregandoOperacionais ? (
+                            <div className="relatorio-vazio">
+                                Carregando registros operacionais...
+                            </div>
+                        ) : operacionais.length === 0 ? (
+                            <div className="relatorio-vazio">
+                                Nenhum registro operacional encontrado.
+                            </div>
+                        ) : (
+                            <div className="relatorio-tabela-container">
+                                <table className="relatorio-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Equipamento</th>
+                                            <th>Modelo</th>
+                                            <th>Patrimônio</th>
+                                            <th>Registro ANVISA</th>
+                                            <th>Unidade</th>
+                                            <th>Sala</th>
+                                            <th>Data de aquisição</th>
+                                            <th>Status</th>
+                                            <th>Manutenção interna</th>
+                                            <th>Manutenção externa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {operacionais.map((item) => (
+                                            <tr key={item.id}>
+                                                <td>{item.codigo || '-'}</td>
+                                                <td>{item.nome || '-'}</td>
+                                                <td>{item.modelo || '-'}</td>
+                                                <td>{item.numero_patrimonio_fase || '-'}</td>
+                                                <td>{item.registro_anvisa_ms || '-'}</td>
+                                                <td>{item.unidade || '-'}</td>
+                                                <td>{item.sala || '-'}</td>
+                                                <td>
+                                                    {item.data_aquisicao
+                                                        ? new Date(item.data_aquisicao).toLocaleDateString(
+                                                            'pt-BR',
+                                                            { timeZone: 'UTC' }
+                                                        )
+                                                        : '-'}
+                                                </td>
+                                                <td>{item.status_operacional || '-'}</td>
+                                                <td>{item.frequencia_manutencao_interna || '-'}</td>
+                                                <td>{item.frequencia_manutencao_externa || '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                    </div>
+                )}
+            </section>
 
 
         </div>
