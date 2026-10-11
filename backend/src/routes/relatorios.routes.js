@@ -5,7 +5,8 @@ const {
     listarEquipamentos,
     listarManutencoes,
     listarQualificacoes,
-    listarOperacionais
+    listarOperacionais,
+    listarRegulatorios
 } = require('../controllers/relatorios.controller');
 
 
@@ -42,6 +43,14 @@ router.get(
     autenticar,
     autorizar('ADMIN', 'EDITOR', 'LEITOR'),
     listarOperacionais
+);
+
+
+router.get(
+    '/regulatorios',
+    autenticar,
+    autorizar('ADMIN', 'EDITOR', 'LEITOR'),
+    listarRegulatorios
 );
 
 

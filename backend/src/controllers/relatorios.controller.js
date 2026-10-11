@@ -170,9 +170,55 @@ const listarOperacionais = async (req, res) => {
 };
 
 
+const listarRegulatorios = async (req, res) => {
+    try {
+        const {
+            codigo,
+            nome,
+            registro_anvisa_ms,
+            situacao_regulatoria,
+            data_registro,
+            data_validade,
+            fabricante_legal,
+            detentor_registro,
+            status_validade
+        } = req.query;
+
+        const regulatorios =
+            await relatoriosService.listarRegulatorios({
+                codigo,
+                nome,
+                registroAnvisaMs: registro_anvisa_ms,
+                situacaoRegulatoria: situacao_regulatoria,
+                dataRegistro: data_registro,
+                dataValidade: data_validade,
+                fabricanteLegal: fabricante_legal,
+                detentorRegistro: detentor_registro,
+                statusValidade: status_validade
+            });
+
+        return res.status(200).json({
+            regulatorios
+        });
+
+    } catch (error) {
+        console.error(
+            'Erro ao gerar relatório regulatório:',
+            error
+        );
+
+        return res.status(500).json({
+            mensagem: 'Erro ao gerar relatório regulatório'
+        });
+    }
+};
+
+
+
 module.exports = {
     listarEquipamentos,
     listarManutencoes,
     listarQualificacoes,
-    listarOperacionais
+    listarOperacionais,
+    listarRegulatorios
 };

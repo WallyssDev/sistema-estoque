@@ -38,6 +38,22 @@ function Relatorios() {
     const [operacionais, setOperacionais] = useState([]);
     const [carregandoOperacionais, setCarregandoOperacionais] = useState(false);
     const [erroOperacionais, setErroOperacionais] = useState('');
+    const [regulatorios, setRegulatorios] = useState([]);
+    const [carregandoRegulatorios, setCarregandoRegulatorios] = useState(false);
+    const [erroRegulatorios, setErroRegulatorios] = useState('');
+
+    const [filtrosRegulatorios, setFiltrosRegulatorios] = useState({
+        codigo: '',
+        nome: '',
+        registro_anvisa_ms: '',
+        situacao_regulatoria: '',
+        data_registro: '',
+        data_validade: '',
+        fabricante_legal: '',
+        detentor_registro: '',
+        status_validade: ''
+    });
+
 
 
 
@@ -237,6 +253,314 @@ function Relatorios() {
             setCarregandoOperacionais(false);
         }
     };
+
+
+    const carregarRegulatorios = async (
+        filtrosAtuais = filtrosRegulatorios
+    ) => {
+        try {
+            setCarregandoRegulatorios(true);
+            setErroRegulatorios('');
+
+            const parametros = {};
+
+            Object.entries(filtrosAtuais).forEach(([chave, valor]) => {
+                if (valor !== '') {
+                    parametros[chave] = valor;
+                }
+            });
+
+            const resposta = await api.get('/relatorios/regulatorios', {
+                params: parametros
+            });
+
+            setRegulatorios(resposta.data.regulatorios || []);
+        } catch (error) {
+            console.error(
+                'Erro ao carregar relatório regulatório:',
+                error
+            );
+
+            setRegulatorios([]);
+
+            setErroRegulatorios(
+                error.response?.data?.mensagem ||
+                'Erro ao carregar relatório regulatório.'
+            );
+        } finally {
+            setCarregandoRegulatorios(false);
+        }
+    };
+
+
+    const exportarRegulatoriosExcel = () => {
+        if (regulatorios.length === 0) {
+            setErroRegulatorios('Não há registros regulatórios para exportar.');
+            return;
+        }
+
+        try {
+            const dataAtual = new Date();
+            const dataArquivo = dataAtual.toISOString().slice(0, 10);
+            const formatarData = (data) => data
+                ? new Date(data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                : '-';
+
+            const bordaPadrao = {
+                top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+                right: { style: 'thin', color: { rgb: 'D1D5DB' } }
+            };
+
+            const estiloTitulo = {
+                font: { bold: true, sz: 18, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '111827' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+            const estiloSubtitulo = {
+                font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '1F2937' } },
+                alignment: { horizontal: 'center', vertical: 'center' }
+            };
+            const estiloInformacao = {
+                font: { sz: 10, color: { rgb: '4B5563' } },
+                fill: { patternType: 'solid', fgColor: { rgb: 'F3F4F6' } },
+                alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
+                border: bordaPadrao
+            };
+            const estiloCabecalho = {
+                font: { bold: true, sz: 10, color: { rgb: 'FFFFFF' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '2563EB' } },
+                alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+                border: bordaPadrao
+            };
+            const estiloCelula = {
+                font: { sz: 10, color: { rgb: '374151' } },
+                alignment: { vertical: 'center', wrapText: true },
+                border: bordaPadrao
+            };
+            const criarCelula = (valor, estilo = estiloCelula) => ({
+                v: String(valor ?? '-'), t: 's', s: estilo
+            });
+            const filtrosAplicados = Object.entries({
+                'Código': filtrosRegulatorios.codigo,
+                'Equipamento': filtrosRegulatorios.nome,
+                'Registro ANVISA/MS': filtrosRegulatorios.registro_anvisa_ms,
+                'Situação regulatória': filtrosRegulatorios.situacao_regulatoria,
+                'Data de registro': filtrosRegulatorios.data_registro,
+                'Data de validade': filtrosRegulatorios.data_validade,
+                'Fabricante legal': filtrosRegulatorios.fabricante_legal,
+                'Detentor do registro': filtrosRegulatorios.detentor_registro,
+                'Status da validade': filtrosRegulatorios.status_validade
+            }).filter(([, valor]) => valor !== '').map(([campo, valor]) => `${campo}: ${valor}`);
+
+            const cabecalhos = [
+                'Código', 'Equipamento', 'Registro ANVISA/MS', 'Situação regulatória',
+                'Data de registro', 'Data de validade', 'Status da validade',
+                'Fabricante legal', 'Detentor do registro', 'Documento regulatório'
+            ];
+            const linhas = regulatorios.map((item) => {
+                const status = String(item.status_validade || '').toUpperCase();
+                let estiloStatus = estiloCelula;
+                if (status === 'VIGENTE') {
+                    estiloStatus = { ...estiloCelula, font: { bold: true, sz: 10, color: { rgb: '166534' } }, fill: { patternType: 'solid', fgColor: { rgb: 'DCFCE7' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true } };
+                } else if (status === 'VENCIDO') {
+                    estiloStatus = { ...estiloCelula, font: { bold: true, sz: 10, color: { rgb: '991B1B' } }, fill: { patternType: 'solid', fgColor: { rgb: 'FEE2E2' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true } };
+                } else if (status === 'VENCE EM 30 DIAS') {
+                    estiloStatus = { ...estiloCelula, font: { bold: true, sz: 10, color: { rgb: '92400E' } }, fill: { patternType: 'solid', fgColor: { rgb: 'FEF3C7' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true } };
+                }
+
+                return [
+                    item.codigo || '-',
+                    item.nome || '-',
+                    item.registro_anvisa_ms || '-',
+                    item.situacao_regulatoria || '-',
+                    formatarData(item.data_registro),
+                    formatarData(item.data_validade),
+                    { valor: item.status_validade || '-', estilo: estiloStatus },
+                    item.fabricante_legal || '-',
+                    item.detentor_registro || '-',
+                    item.documento_regulatorio || '-'
+                ];
+            });
+
+            const totalColunas = cabecalhos.length;
+            const linhaMesclada = (texto, estilo) => [
+                criarCelula(texto, estilo),
+                ...Array.from({ length: totalColunas - 1 }, () => criarCelula('', estilo))
+            ];
+            const dados = [
+                linhaMesclada('SISTEMA DE CONTROLE DE ESTOQUE', estiloTitulo),
+                linhaMesclada('RELATÓRIO REGULATÓRIO', estiloSubtitulo),
+                linhaMesclada(`Gerado em: ${dataAtual.toLocaleDateString('pt-BR')} às ${dataAtual.toLocaleTimeString('pt-BR')}`, estiloInformacao),
+                linhaMesclada(`Total de registros: ${regulatorios.length}`, estiloInformacao),
+                linhaMesclada(`Filtros aplicados: ${filtrosAplicados.length ? filtrosAplicados.join(' | ') : 'Nenhum'}`, estiloInformacao),
+                cabecalhos.map((texto) => criarCelula(texto, estiloCabecalho)),
+                ...linhas.map((linha) => linha.map((valor) =>
+                    typeof valor === 'object' && valor !== null && 'valor' in valor
+                        ? criarCelula(valor.valor, valor.estilo)
+                        : criarCelula(valor)
+                ))
+            ];
+
+            const planilha = XLSX.utils.aoa_to_sheet(dados);
+            planilha['!merges'] = [0, 1, 2, 3, 4].map((linha) => ({
+                s: { r: linha, c: 0 }, e: { r: linha, c: totalColunas - 1 }
+            }));
+            planilha['!cols'] = [
+                { wch: 14 }, { wch: 30 }, { wch: 24 }, { wch: 24 }, { wch: 18 },
+                { wch: 18 }, { wch: 22 }, { wch: 28 }, { wch: 28 }, { wch: 32 }
+            ];
+            planilha['!rows'] = [
+                { hpt: 30 }, { hpt: 24 }, { hpt: 22 }, { hpt: 22 }, { hpt: 36 },
+                { hpt: 32 }, ...regulatorios.map(() => ({ hpt: 30 }))
+            ];
+            planilha['!autofilter'] = { ref: `A6:J${dados.length}` };
+
+            const livro = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(livro, planilha, 'Regulatorio');
+            XLSX.writeFile(livro, `Relatorio_Regulatorio_${dataArquivo}.xlsx`);
+            setErroRegulatorios('');
+        } catch (error) {
+            console.error('Erro ao exportar relatório regulatório para Excel:', error);
+            setErroRegulatorios('Erro ao exportar relatório regulatório para Excel.');
+        }
+    };
+
+    const exportarRegulatoriosPDF = () => {
+        if (regulatorios.length === 0) {
+            setErroRegulatorios('Não há registros regulatórios para exportar.');
+            return;
+        }
+
+        try {
+            const documento = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const margem = 14;
+            const larguraPagina = documento.internal.pageSize.getWidth();
+            const alturaPagina = documento.internal.pageSize.getHeight();
+            const larguraConteudo = larguraPagina - margem * 2;
+            const azulEscuro = [17, 24, 39];
+            const azulCabecalho = [37, 99, 235];
+            const cinzaTexto = [71, 85, 105];
+            const branco = [255, 255, 255];
+            const dataArquivo = new Date().toISOString().slice(0, 10);
+            const formatarData = (data) => data
+                ? new Date(data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                : '-';
+
+            const filtrosAplicados = Object.entries({
+                'Código': filtrosRegulatorios.codigo,
+                'Equipamento': filtrosRegulatorios.nome,
+                'Registro ANVISA/MS': filtrosRegulatorios.registro_anvisa_ms,
+                'Situação regulatória': filtrosRegulatorios.situacao_regulatoria,
+                'Data de registro': filtrosRegulatorios.data_registro,
+                'Data de validade': filtrosRegulatorios.data_validade,
+                'Fabricante legal': filtrosRegulatorios.fabricante_legal,
+                'Detentor do registro': filtrosRegulatorios.detentor_registro,
+                'Status da validade': filtrosRegulatorios.status_validade
+            }).filter(([, valor]) => valor !== '').map(([campo, valor]) => `${campo}: ${valor}`);
+
+            documento.setFillColor(...azulEscuro);
+            documento.rect(margem, 10, larguraConteudo, 23, 'F');
+            documento.setTextColor(...branco);
+            documento.setFont('helvetica', 'bold');
+            documento.setFontSize(16);
+            documento.text('SISTEMA DE CONTROLE DE ESTOQUE', larguraPagina / 2, 19, { align: 'center' });
+            documento.setFontSize(12);
+            documento.text('RELATÓRIO REGULATÓRIO', larguraPagina / 2, 27, { align: 'center' });
+
+            documento.setTextColor(...cinzaTexto);
+            documento.setFont('helvetica', 'normal');
+            documento.setFontSize(8.5);
+            documento.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margem, 40);
+            documento.text(`Total de registros: ${regulatorios.length}`, larguraPagina - margem, 40, { align: 'right' });
+            documento.setFont('helvetica', 'bold');
+            documento.text('Filtros aplicados:', margem, 48);
+            documento.setFont('helvetica', 'normal');
+            const textoFiltros = filtrosAplicados.length ? filtrosAplicados.join(' | ') : 'Nenhum';
+            const linhasFiltros = documento.splitTextToSize(textoFiltros, larguraConteudo - 35);
+            documento.text(linhasFiltros, margem + 30, 48);
+            const inicioTabela = 53 + Math.max(0, (linhasFiltros.length - 1) * 4);
+
+            const cabecalhos = [
+                'Código', 'Equipamento', 'Registro ANVISA/MS', 'Situação regulatória',
+                'Data de registro', 'Data de validade', 'Status da validade',
+                'Fabricante legal', 'Detentor do registro', 'Documento regulatório'
+            ];
+            const linhas = regulatorios.map((item) => [
+                item.codigo || '-',
+                item.nome || '-',
+                item.registro_anvisa_ms || '-',
+                item.situacao_regulatoria || '-',
+                formatarData(item.data_registro),
+                formatarData(item.data_validade),
+                item.status_validade || '-',
+                item.fabricante_legal || '-',
+                item.detentor_registro || '-',
+                item.documento_regulatorio || '-'
+            ]);
+
+            autoTable(documento, {
+                head: [cabecalhos],
+                body: linhas,
+                startY: inicioTabela,
+                margin: { left: margem, right: margem, bottom: 14 },
+                tableWidth: 'auto',
+                theme: 'grid',
+                styles: {
+                    font: 'helvetica', fontSize: 6.5, textColor: [30, 41, 59],
+                    cellPadding: 2, lineColor: [203, 213, 225], lineWidth: 0.2,
+                    valign: 'middle', overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: azulCabecalho, textColor: branco, fontStyle: 'bold',
+                    fontSize: 7, halign: 'center', valign: 'middle'
+                },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+                didParseCell: (dados) => {
+                    if (dados.section !== 'body') return;
+                    const coluna = dados.column.index;
+                    const status = String(dados.cell.raw || '').toUpperCase();
+                    if (coluna === 6) {
+                        if (status === 'VIGENTE') {
+                            dados.cell.styles.fillColor = [220, 252, 231];
+                            dados.cell.styles.textColor = [22, 101, 52];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (status === 'VENCIDO') {
+                            dados.cell.styles.fillColor = [254, 226, 226];
+                            dados.cell.styles.textColor = [153, 27, 27];
+                            dados.cell.styles.fontStyle = 'bold';
+                        } else if (status === 'VENCE EM 30 DIAS') {
+                            dados.cell.styles.fillColor = [254, 243, 199];
+                            dados.cell.styles.textColor = [146, 64, 14];
+                            dados.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
+            });
+
+            const totalPaginas = documento.internal.getNumberOfPages();
+            for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+                documento.setPage(pagina);
+                documento.setDrawColor(203, 213, 225);
+                documento.setLineWidth(0.2);
+                documento.line(margem, alturaPagina - 10, larguraPagina - margem, alturaPagina - 10);
+                documento.setFont('helvetica', 'normal');
+                documento.setFontSize(7);
+                documento.setTextColor(...cinzaTexto);
+                documento.text('Sistema de Controle de Estoque', margem, alturaPagina - 4);
+                documento.text(`Página ${pagina} de ${totalPaginas}`, larguraPagina - margem, alturaPagina - 4, { align: 'right' });
+            }
+
+            documento.save(`Relatorio_Regulatorio_${dataArquivo}.pdf`);
+            setErroRegulatorios('');
+        } catch (error) {
+            console.error('Erro ao exportar relatório regulatório para PDF:', error);
+            setErroRegulatorios('Erro ao exportar relatório regulatório para PDF.');
+        }
+    };
+
 
     const exportarOperacionaisExcel = () => {
         if (operacionais.length === 0) {
@@ -611,6 +935,7 @@ function Relatorios() {
         carregarManutencoes();
         carregarQualificacoes();
         carregarOperacionais();
+        carregarRegulatorios();
     }, []);
 
     const handleFiltroChange = (evento) => {
@@ -4199,7 +4524,7 @@ function Relatorios() {
 
                         <div className="relatorio-resultado-header">
                             <div>
-                                <h3>Resultado operacional</h3>
+                                <h3>Resultado</h3>
                                 <p>
                                     {operacionais.length} registro(s) encontrado(s).
                                 </p>
@@ -4295,6 +4620,340 @@ function Relatorios() {
                     </div>
                 )}
             </section>
+
+
+            <section className="relatorio-card relatorio-painel">
+                <button
+                    type="button"
+                    className="relatorio-painel-cabecalho"
+                    onClick={() => alternarPainel('regulatorios')}
+                    aria-expanded={paineisAbertos.regulatorios}
+                >
+                    <span className="relatorio-painel-titulo">
+                        <h3>Relatório Regulatório</h3>
+                        <p>
+                            {regulatorios.length} registro(s) regulatório(s) encontrado(s).
+                        </p>
+                    </span>
+
+                    <span
+                        className={`relatorio-painel-icone ${paineisAbertos.regulatorios ? 'aberto' : ''
+                            }`}
+                        aria-hidden="true"
+                    >
+                        ›
+                    </span>
+                </button>
+
+                {paineisAbertos.regulatorios && (
+                    <div className="relatorio-painel-conteudo">
+
+
+                        <form
+                            className="relatorio-filtros"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                carregarRegulatorios(filtrosRegulatorios);
+                            }}
+                        >
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_codigo">Código</label>
+                                    <input
+                                        id="regulatorio_codigo"
+                                        type="text"
+                                        value={filtrosRegulatorios.codigo}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                codigo: e.target.value
+                                            }))
+                                        }
+                                        placeholder="Código do equipamento"
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_nome">Equipamento</label>
+                                    <input
+                                        id="regulatorio_nome"
+                                        type="text"
+                                        value={filtrosRegulatorios.nome}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                nome: e.target.value
+                                            }))
+                                        }
+                                        placeholder="Nome do equipamento"
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_registro">Registro ANVISA/MS</label>
+                                    <input
+                                        id="regulatorio_registro"
+                                        type="text"
+                                        value={filtrosRegulatorios.registro_anvisa_ms}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                registro_anvisa_ms: e.target.value
+                                            }))
+                                        }
+                                        placeholder="Número do registro"
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_situacao">
+                                        Situação regulatória
+                                    </label>
+                                    <select
+                                        id="regulatorio_situacao"
+                                        value={filtrosRegulatorios.situacao_regulatoria}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                situacao_regulatoria: e.target.value
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Todas</option>
+                                        <option value="VIGENTE">Vigente</option>
+                                        <option value="VENCIDO">Vencido</option>
+                                    </select>
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_data_registro">
+                                        Data de registro
+                                    </label>
+                                    <input
+                                        id="regulatorio_data_registro"
+                                        type="date"
+                                        value={filtrosRegulatorios.data_registro}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                data_registro: e.target.value
+                                            }))
+                                        }
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_data_validade">
+                                        Data de validade
+                                    </label>
+                                    <input
+                                        id="regulatorio_data_validade"
+                                        type="date"
+                                        value={filtrosRegulatorios.data_validade}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                data_validade: e.target.value
+                                            }))
+                                        }
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_fabricante">
+                                        Fabricante legal
+                                    </label>
+                                    <input
+                                        id="regulatorio_fabricante"
+                                        type="text"
+                                        value={filtrosRegulatorios.fabricante_legal}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                fabricante_legal: e.target.value
+                                            }))
+                                        }
+                                        placeholder="Nome do fabricante"
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_detentor">
+                                        Detentor do registro
+                                    </label>
+                                    <input
+                                        id="regulatorio_detentor"
+                                        type="text"
+                                        value={filtrosRegulatorios.detentor_registro}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                detentor_registro: e.target.value
+                                            }))
+                                        }
+                                        placeholder="Nome do detentor"
+                                    />
+                                </div>
+
+                                <div className="campo-relatorio">
+                                    <label htmlFor="regulatorio_status_validade">
+                                        Status da validade
+                                    </label>
+                                    <select
+                                        id="regulatorio_status_validade"
+                                        value={filtrosRegulatorios.status_validade}
+                                        onChange={(e) =>
+                                            setFiltrosRegulatorios((atual) => ({
+                                                ...atual,
+                                                status_validade: e.target.value
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Todos</option>
+                                        <option value="VIGENTE">Vigente</option>
+                                        <option value="VENCE EM 30 DIAS">
+                                            Vence em 30 dias
+                                        </option>
+                                        <option value="VENCIDO">Vencido</option>
+                                        <option value="SEM VALIDADE">Sem validade</option>
+                                    </select>
+                                </div>
+
+                            <div className="relatorio-acoes">
+                                <button
+                                    type="button"
+                                    className="botao-relatorio botao-secundario"
+                                    onClick={() => {
+                                        const filtrosLimpos = {
+                                            codigo: '',
+                                            nome: '',
+                                            registro_anvisa_ms: '',
+                                            situacao_regulatoria: '',
+                                            data_registro: '',
+                                            data_validade: '',
+                                            fabricante_legal: '',
+                                            detentor_registro: '',
+                                            status_validade: ''
+                                        };
+
+                                        setFiltrosRegulatorios(filtrosLimpos);
+                                        carregarRegulatorios(filtrosLimpos);
+                                    }}
+                                    disabled={carregandoRegulatorios}
+                                >
+                                    Limpar filtros
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="botao-relatorio botao-principal"
+                                    disabled={carregandoRegulatorios}
+                                >
+                                    {carregandoRegulatorios
+                                        ? 'Carregando...'
+                                        : 'Gerar relatório'}
+                                </button>
+                            </div>
+                        </form>
+
+
+                        <div className="relatorio-resultado-header">
+                            <div>
+                                <h3>Resultado</h3>
+                                <p>
+                                    {regulatorios.length} registro(s) encontrado(s).
+                                </p>
+                            </div>
+
+                            <div className="relatorios-exportacoes">
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-excel"
+                                    onClick={exportarRegulatoriosExcel}
+                                    disabled={carregandoRegulatorios || regulatorios.length === 0}
+                                >
+                                    Exportar Excel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="relatorios-exportar-button relatorios-exportar-pdf"
+                                    onClick={exportarRegulatoriosPDF}
+                                    disabled={carregandoRegulatorios || regulatorios.length === 0}
+                                >
+                                    Exportar PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        {erroRegulatorios && (
+                            <div className="mensagem-relatorio mensagem-erro">
+                                {erroRegulatorios}
+                            </div>
+                        )}
+
+                        {carregandoRegulatorios ? (
+                            <div className="relatorio-vazio">
+                                Carregando registros regulatórios...
+                            </div>
+                        ) : regulatorios.length === 0 ? (
+                            <div className="relatorio-vazio">
+                                Nenhum registro regulatório encontrado.
+                            </div>
+                        ) : (
+                            <div className="relatorio-tabela-container">
+                                <table className="relatorio-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Equipamento</th>
+                                            <th>Registro ANVISA/MS</th>
+                                            <th>Situação regulatória</th>
+                                            <th>Data de registro</th>
+                                            <th>Validade</th>
+                                            <th>Status da validade</th>
+                                            <th>Fabricante legal</th>
+                                            <th>Detentor do registro</th>
+                                            <th>Documento</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {regulatorios.map((item) => (
+                                            <tr key={item.id}>
+                                                <td>{item.codigo || '-'}</td>
+                                                <td>{item.nome || '-'}</td>
+                                                <td>{item.registro_anvisa_ms || '-'}</td>
+                                                <td>{item.situacao_regulatoria || '-'}</td>
+                                                <td>
+                                                    {item.data_registro
+                                                        ? new Date(item.data_registro)
+                                                            .toLocaleDateString('pt-BR', {
+                                                                timeZone: 'UTC'
+                                                            })
+                                                        : '-'}
+                                                </td>
+                                                <td>
+                                                    {item.data_validade
+                                                        ? new Date(item.data_validade)
+                                                            .toLocaleDateString('pt-BR', {
+                                                                timeZone: 'UTC'
+                                                            })
+                                                        : '-'}
+                                                </td>
+                                                <td>{item.status_validade || '-'}</td>
+                                                <td>{item.fabricante_legal || '-'}</td>
+                                                <td>{item.detentor_registro || '-'}</td>
+                                                <td>{item.documento_regulatorio || '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </section>
+
 
 
         </div>

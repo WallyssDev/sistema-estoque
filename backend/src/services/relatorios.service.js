@@ -422,9 +422,133 @@ const listarOperacionais = async ({
     return resultado.rows;
 };
 
+
+const listarRegulatorios = async ({
+    codigo = null,
+    nome = null,
+    registroAnvisaMs = null,
+    situacaoRegulatoria = null,
+    dataRegistro = null,
+    dataValidade = null,
+    fabricanteLegal = null,
+    detentorRegistro = null,
+    statusValidade = null
+} = {}) => {
+    const valores = [];
+    const filtros = [];
+
+    const expressaoStatus = `
+        CASE
+            WHEN r.data_validade IS NULL
+                THEN 'SEM VALIDADE'
+
+            WHEN r.data_validade < CURRENT_DATE
+                THEN 'VENCIDO'
+
+            WHEN r.data_validade <= CURRENT_DATE + 30
+                THEN 'VENCE EM 30 DIAS'
+
+            ELSE 'VIGENTE'
+        END
+    `;
+
+    let consulta = `
+        SELECT
+            r.id,
+            r.equipamento_id,
+            e.codigo,
+            e.nome,
+            r.registro_anvisa_ms,
+            r.situacao_regulatoria,
+            r.data_registro,
+            r.data_validade,
+            r.fabricante_legal,
+            r.detentor_registro,
+            r.documento_regulatorio,
+            r.observacoes,
+            r.created_at,
+            ${expressaoStatus} AS status_validade
+        FROM regulatorios r
+        INNER JOIN equipamentos e
+            ON e.id = r.equipamento_id
+    `;
+
+    if (codigo) {
+        valores.push(`%${codigo}%`);
+        filtros.push(`e.codigo ILIKE $${valores.length}`);
+    }
+
+    if (nome) {
+        valores.push(`%${nome}%`);
+        filtros.push(`e.nome ILIKE $${valores.length}`);
+    }
+
+    if (registroAnvisaMs) {
+        valores.push(`%${registroAnvisaMs}%`);
+        filtros.push(
+            `r.registro_anvisa_ms ILIKE $${valores.length}`
+        );
+    }
+
+    if (situacaoRegulatoria) {
+        valores.push(situacaoRegulatoria);
+        filtros.push(
+            `r.situacao_regulatoria = $${valores.length}`
+        );
+    }
+
+    if (dataRegistro) {
+        valores.push(dataRegistro);
+        filtros.push(`r.data_registro = $${valores.length}`);
+    }
+
+    if (dataValidade) {
+        valores.push(dataValidade);
+        filtros.push(`r.data_validade = $${valores.length}`);
+    }
+
+    if (fabricanteLegal) {
+        valores.push(`%${fabricanteLegal}%`);
+        filtros.push(
+            `r.fabricante_legal ILIKE $${valores.length}`
+        );
+    }
+
+    if (detentorRegistro) {
+        valores.push(`%${detentorRegistro}%`);
+        filtros.push(
+            `r.detentor_registro ILIKE $${valores.length}`
+        );
+    }
+
+    if (statusValidade) {
+        valores.push(statusValidade);
+        filtros.push(
+            `${expressaoStatus} = $${valores.length}`
+        );
+    }
+
+    if (filtros.length > 0) {
+        consulta += ` WHERE ${filtros.join(' AND ')}`;
+    }
+
+    consulta += `
+        ORDER BY
+            r.data_validade ASC NULLS LAST,
+            e.codigo ASC,
+            r.id ASC
+    `;
+
+    const resultado = await pool.query(consulta, valores);
+
+    return resultado.rows;
+};
+
+
 module.exports = {
     listarEquipamentos,
     listarManutencoes,
     listarQualificacoes,
-    listarOperacionais
+    listarOperacionais,
+    listarRegulatorios
 };
