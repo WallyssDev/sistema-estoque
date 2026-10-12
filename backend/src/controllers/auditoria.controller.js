@@ -3,6 +3,28 @@ const {
     listarUsuariosAuditoria
 } = require('../services/auditoria.service');
 
+
+const dataISOValida = (valor) => {
+    if (valor === undefined || valor === null || valor === '') {
+        return true;
+    }
+
+    if (
+        typeof valor !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(valor)
+    ) {
+        return false;
+    }
+
+    const data = new Date(`${valor}T00:00:00.000Z`);
+
+    return (
+        !Number.isNaN(data.getTime()) &&
+        data.toISOString().slice(0, 10) === valor
+    );
+};
+
+
 const consultarAuditoria = async (req, res) => {
 
     try {
@@ -39,6 +61,20 @@ const consultarAuditoria = async (req, res) => {
                 mensagem: 'O limite deve ser um número entre 1 e 100'
             });
         }
+
+
+        if (!dataISOValida(data_inicio) || !dataISOValida(data_fim)) {
+            return res.status(400).json({
+                mensagem: 'As datas devem estar no formato AAAA-MM-DD e ser datas válidas.'
+            });
+        }
+
+        if (data_inicio && data_fim && data_inicio > data_fim) {
+            return res.status(400).json({
+                mensagem: 'A data inicial não pode ser posterior à data final.'
+            });
+        }
+
 
         const resultado = await listarAuditoria({
             pagina: paginaNumero,
