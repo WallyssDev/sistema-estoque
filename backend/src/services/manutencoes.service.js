@@ -1,5 +1,134 @@
+
 const pool = require('../database/connection');
 const { registrarAuditoria } = require('./auditoria.service');
+
+const validarDataISO = (valor, obrigatoria = false) => {
+    if (valor === null || valor === undefined || valor === '') {
+        return !obrigatoria;
+    }
+
+    if (
+        typeof valor !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(valor)
+    ) {
+        return false;
+    }
+
+    const data = new Date(`${valor}T00:00:00.000Z`);
+
+    return (
+        !Number.isNaN(data.getTime()) &&
+        data.toISOString().slice(0, 10) === valor
+    );
+};
+
+const validarEquipamentoId = (equipamentoId) => {
+    if (
+        equipamentoId === null ||
+        equipamentoId === undefined ||
+        String(equipamentoId).trim() === '' ||
+        !Number.isInteger(Number(equipamentoId)) ||
+        Number(equipamentoId) <= 0
+    ) {
+        throw new Error('Selecione um equipamento válido');
+    }
+};
+
+const validarDadosManutencao = ({
+    tipo,
+    dataManutencao,
+    proximaManutencao,
+    responsavel,
+    descricao,
+    resultado
+}) => {
+    const tiposPermitidos = [
+        'PREVENTIVA',
+        'CORRETIVA',
+        'CALIBRACAO',
+        'OUTRA'
+    ];
+
+    const resultadosPermitidos = [
+        'APROVADO',
+        'REPROVADO',
+        'APROVADO_COM_RESTRICAO'
+    ];
+
+    if (!tiposPermitidos.includes(tipo)) {
+        throw new Error('Tipo de manutenção inválido');
+    }
+
+    if (!validarDataISO(dataManutencao, true)) {
+        throw new Error('Informe uma data de manutenção válida');
+    }
+
+    if (!validarDataISO(proximaManutencao)) {
+        throw new Error(
+            'Informe uma data válida para a próxima manutenção'
+        );
+    }
+
+    if (
+        proximaManutencao &&
+        proximaManutencao < dataManutencao
+    ) {
+        throw new Error(
+            'A próxima manutenção não pode ser anterior à data da manutenção realizada'
+        );
+    }
+
+    if (
+        typeof responsavel !== 'string' ||
+        !responsavel.trim()
+    ) {
+        throw new Error('Informe o responsável pela manutenção');
+    }
+
+    if (responsavel.trim().length > 150) {
+        throw new Error(
+            'O nome do responsável deve ter no máximo 150 caracteres'
+        );
+    }
+
+    if (
+        typeof descricao !== 'string' ||
+        !descricao.trim()
+    ) {
+        throw new Error('Informe a descrição da manutenção');
+    }
+
+    if (!resultadosPermitidos.includes(resultado)) {
+        throw new Error('Resultado da manutenção inválido');
+    }
+};
+
+const desfazerTransacao = async (client) => {
+    if (!client) {
+        return;
+    }
+
+    try {
+        await client.query('ROLLBACK');
+    } catch (erroRollback) {
+        console.error(
+            'Erro ao desfazer transação de manutenção:',
+            erroRollback
+        );
+    }
+};
+
+const normalizarData = (valor) => {
+    if (valor === null || valor === undefined || valor === '') {
+        return null;
+    }
+
+    if (valor instanceof Date) {
+        return valor.toISOString().slice(0, 10);
+    }
+
+    return String(valor).slice(0, 10);
+};
 
 const criarManutencao = async ({
     equipamentoId,
@@ -12,17 +141,19 @@ const criarManutencao = async ({
     observacoes = null,
     usuarioLogadoId
 }) => {
+    validarEquipamentoId(equipamentoId);
 
-    if (
-        !equipamentoId ||
-        !tipo ||
-        !dataManutencao ||
-        !responsavel ||
-        !descricao ||
-        !resultado
-    ) {
-        throw new Error('Os campos obrigatórios não foram preenchidos');
-    }
+    const proximaData = proximaManutencao || null;
+    const observacoesNormalizadas = observacoes?.trim?.() || null;
+
+    validarDadosManutencao({
+        tipo,
+        dataManutencao,
+        proximaManutencao: proximaData,
+        responsavel,
+        descricao,
+        resultado
+    });
 
     const equipamento = await pool.query(
         `
@@ -30,7 +161,7 @@ const criarManutencao = async ({
         FROM equipamentos
         WHERE id = $1
         `,
-        [equipamentoId]
+        [Number(equipamentoId)]
     );
 
     if (equipamento.rows.length === 0) {
@@ -38,7 +169,9 @@ const criarManutencao = async ({
     }
 
     if (!equipamento.rows[0].ativo) {
-        throw new Error('Não é possível registrar manutenção para equipamento desativado');
+        throw new Error(
+            'Não é possível registrar manutenção para equipamento desativado'
+        );
     }
 
     let client;
@@ -74,14 +207,14 @@ const criarManutencao = async ({
                 created_at
             `,
             [
-                equipamentoId,
+                Number(equipamentoId),
                 tipo,
                 dataManutencao,
-                proximaManutencao,
-                responsavel,
-                descricao,
+                proximaData,
+                responsavel.trim(),
+                descricao.trim(),
                 resultado,
-                observacoes
+                observacoesNormalizadas
             ]
         );
 
@@ -99,17 +232,10 @@ const criarManutencao = async ({
         await client.query('COMMIT');
 
         return manutencaoCriada;
-
     } catch (error) {
-
-        if (client) {
-            await client.query('ROLLBACK');
-        }
-
+        await desfazerTransacao(client);
         throw error;
-
     } finally {
-
         if (client) {
             client.release();
         }
@@ -117,7 +243,6 @@ const criarManutencao = async ({
 };
 
 const listarManutencoes = async ({ equipamentoId = null } = {}) => {
-
     const valores = [];
     const filtros = [];
 
@@ -140,8 +265,10 @@ const listarManutencoes = async ({ equipamentoId = null } = {}) => {
             ON e.id = m.equipamento_id
     `;
 
-    if (equipamentoId) {
-        valores.push(equipamentoId);
+    if (equipamentoId !== null && equipamentoId !== undefined && equipamentoId !== '') {
+        validarEquipamentoId(equipamentoId);
+
+        valores.push(Number(equipamentoId));
         filtros.push(`m.equipamento_id = $${valores.length}`);
     }
 
@@ -158,18 +285,6 @@ const listarManutencoes = async ({ equipamentoId = null } = {}) => {
     return resultado.rows;
 };
 
-const normalizarData = (valor) => {
-    if (valor === null || valor === undefined) {
-        return null;
-    }
-
-    if (valor instanceof Date) {
-        return valor.toISOString().split('T')[0];
-    }
-
-    return String(valor).slice(0, 10);
-};
-
 const atualizarManutencao = async ({
     manutencaoId,
     tipo,
@@ -181,17 +296,27 @@ const atualizarManutencao = async ({
     observacoes = null,
     usuarioLogadoId
 }) => {
-
     if (
-        !manutencaoId ||
-        !tipo ||
-        !dataManutencao ||
-        !responsavel ||
-        !descricao ||
-        !resultado
+        manutencaoId === null ||
+        manutencaoId === undefined ||
+        String(manutencaoId).trim() === '' ||
+        !Number.isInteger(Number(manutencaoId)) ||
+        Number(manutencaoId) <= 0
     ) {
-        throw new Error('Os campos obrigatórios não foram preenchidos');
+        throw new Error('Manutenção não encontrada');
     }
+
+    const proximaData = proximaManutencao || null;
+    const observacoesNormalizadas = observacoes?.trim?.() || null;
+
+    validarDadosManutencao({
+        tipo,
+        dataManutencao,
+        proximaManutencao: proximaData,
+        responsavel,
+        descricao,
+        resultado
+    });
 
     let client;
 
@@ -216,7 +341,7 @@ const atualizarManutencao = async ({
             FROM manutencoes
             WHERE id = $1
             `,
-            [manutencaoId]
+            [Number(manutencaoId)]
         );
 
         if (consultaAtual.rows.length === 0) {
@@ -228,23 +353,26 @@ const atualizarManutencao = async ({
         const novosDados = {
             tipo,
             data_manutencao: dataManutencao,
-            proxima_manutencao: proximaManutencao,
-            responsavel,
-            descricao,
+            proxima_manutencao: proximaData,
+            responsavel: responsavel.trim(),
+            descricao: descricao.trim(),
             resultado,
-            observacoes
+            observacoes: observacoesNormalizadas
         };
 
         const camposAlterados = [];
 
         const comparar = (campo, valorAnterior, valorNovo) => {
-            const anterior = valorAnterior === null
-                ? null
-                : String(valorAnterior);
+            let anterior = valorAnterior;
+            let novo = valorNovo;
 
-            const novo = valorNovo === null
-                ? null
-                : String(valorNovo);
+            if (campo === 'data_manutencao' || campo === 'proxima_manutencao') {
+                anterior = normalizarData(anterior);
+                novo = normalizarData(novo);
+            } else {
+                anterior = anterior == null ? null : String(anterior);
+                novo = novo == null ? null : String(novo);
+            }
 
             if (anterior !== novo) {
                 camposAlterados.push({
@@ -255,42 +383,28 @@ const atualizarManutencao = async ({
             }
         };
 
-        comparar(
-            'tipo',
-            manutencaoAtual.tipo,
-            novosDados.tipo
-        );
-
+        comparar('tipo', manutencaoAtual.tipo, novosDados.tipo);
         comparar(
             'data_manutencao',
-            normalizarData(manutencaoAtual.data_manutencao),
-            normalizarData(novosDados.data_manutencao)
+            manutencaoAtual.data_manutencao,
+            novosDados.data_manutencao
         );
-
         comparar(
             'proxima_manutencao',
-            normalizarData(manutencaoAtual.proxima_manutencao),
-            normalizarData(novosDados.proxima_manutencao)
+            manutencaoAtual.proxima_manutencao,
+            novosDados.proxima_manutencao
         );
-
         comparar(
             'responsavel',
             manutencaoAtual.responsavel,
             novosDados.responsavel
         );
-
         comparar(
             'descricao',
             manutencaoAtual.descricao,
             novosDados.descricao
         );
-
-        comparar(
-            'resultado',
-            manutencaoAtual.resultado,
-            novosDados.resultado
-        );
-
+        comparar('resultado', manutencaoAtual.resultado, novosDados.resultado);
         comparar(
             'observacoes',
             manutencaoAtual.observacoes,
@@ -326,14 +440,14 @@ const atualizarManutencao = async ({
                 created_at
             `,
             [
-                tipo,
-                dataManutencao,
-                proximaManutencao,
-                responsavel,
-                descricao,
-                resultado,
-                observacoes,
-                manutencaoId
+                novosDados.tipo,
+                novosDados.data_manutencao,
+                novosDados.proxima_manutencao,
+                novosDados.responsavel,
+                novosDados.descricao,
+                novosDados.resultado,
+                novosDados.observacoes,
+                Number(manutencaoId)
             ]
         );
 
@@ -344,7 +458,7 @@ const atualizarManutencao = async ({
                 usuarioId: usuarioLogadoId,
                 acao: 'ALTERACAO',
                 entidade: 'MANUTENCAO',
-                registroId: manutencaoId,
+                registroId: Number(manutencaoId),
                 campo: alteracao.campo,
                 valorAnterior: alteracao.valorAnterior,
                 valorNovo: alteracao.valorNovo,
@@ -355,17 +469,10 @@ const atualizarManutencao = async ({
         await client.query('COMMIT');
 
         return manutencaoAtualizada;
-
     } catch (error) {
-
-        if (client) {
-            await client.query('ROLLBACK');
-        }
-
+        await desfazerTransacao(client);
         throw error;
-
     } finally {
-
         if (client) {
             client.release();
         }
