@@ -275,15 +275,23 @@ function Auditoria() {
      * =====================================================
      */
 
-    useEffect(() => {
 
+    useEffect(() => {
         let ativo = true;
 
-        const carregarAuditoria = async () => {
-
-            setCarregando(true);
-
+        if (intervaloDatasInvalido) {
             setErro('');
+            setCarregando(false);
+
+            return () => {
+                ativo = false;
+            };
+        }
+
+        const carregarAuditoria = async () => {
+            setCarregando(true);
+            setErro('');
+
 
             try {
 
@@ -360,7 +368,7 @@ function Auditoria() {
 
         };
 
-    }, [pagina, filtros]);
+    }, [pagina, filtros, intervaloDatasInvalido]);
 
 
     /*
@@ -772,6 +780,13 @@ function Auditoria() {
     };
 
 
+    const intervaloDatasInvalido =
+        filtros.data_inicio &&
+        filtros.data_fim &&
+        filtros.data_inicio > filtros.data_fim;
+
+
+
     /*
      * =====================================================
      * IDENTIFICAÇÃO DO EQUIPAMENTO
@@ -1082,6 +1097,14 @@ function Auditoria() {
                 </p>
 
             )}
+
+
+            {intervaloDatasInvalido && (
+                <p role="alert">
+                    A data inicial não pode ser posterior à data final.
+                </p>
+            )}
+
 
 
             {erro && (
