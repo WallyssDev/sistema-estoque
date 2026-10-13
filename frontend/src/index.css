@@ -1466,3 +1466,194 @@ body {
         font-size: 17px;
     }
 }
+
+
+/* Nexora — ícones dos painéis de alertas do Dashboard */
+.dashboard-alerta-titulo-texto {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dashboard-alerta-icone {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+.dashboard-alerta-icone-vencida {
+    color: #ef4444;
+}
+
+.dashboard-alerta-icone-proxima {
+    color: #f59e0b;
+}
+
+.dashboard-alerta-data-valor {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.dashboard-alerta-data-valor svg {
+    flex: 0 0 auto;
+    color: #7b8eae;
+    font-size: 13px;
+}
+
+.dashboard-alerta-vencida .dashboard-alerta-data-valor svg {
+    color: #ef4444;
+}
+
+.dashboard-alerta-proxima .dashboard-alerta-data-valor svg {
+    color: #7b8eae;
+}
+
+@media (max-width: 600px) {
+    .dashboard-alerta-titulo-texto {
+        gap: 8px;
+    }
+
+    .dashboard-alerta-icone {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+}
+
+
+/* =========================================================
+   NEXORA — HISTÓRICO / MODAL DE DETALHES DA AUDITORIA
+   ========================================================= */
+.auditoria-modal-overlay {
+    padding: 24px;
+    background: rgba(10, 25, 55, 0.58);
+    backdrop-filter: blur(3px);
+}
+.auditoria-modal {
+    width: min(760px, 100%);
+    max-width: 100%;
+    max-height: 88vh;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dbe5f4;
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(15, 35, 75, 0.28);
+}
+.auditoria-modal-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
+    border-bottom: 1px solid #e2eaf7;
+}
+.auditoria-modal-sobretitulo {
+    display: block;
+    margin-bottom: 7px;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .09em;
+}
+.auditoria-modal-cabecalho h3 {
+    margin: 0 0 5px;
+    color: #14213d;
+    font-size: 22px;
+    font-weight: 750;
+}
+.auditoria-modal-cabecalho p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+.auditoria-modal-fechar-topo {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #d8e3f5 !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: #475569 !important;
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+}
+.auditoria-modal-fechar-topo:hover {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+}
+.auditoria-modal-conteudo {
+    padding: 22px 28px 8px;
+    overflow-y: auto;
+}
+.auditoria-modal-conteudo > p {
+    display: grid;
+    grid-template-columns: minmax(125px, 175px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    margin: 0 !important;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+.auditoria-modal-conteudo > p strong {
+    color: #172b4d;
+    font-weight: 650;
+}
+.auditoria-modal-conteudo > div {
+    margin-top: 20px;
+    padding: 18px;
+    border: 1px solid #e1eaf8;
+    border-radius: 12px;
+    background: #f8faff;
+}
+.auditoria-modal-conteudo > div > strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #17366f;
+}
+.auditoria-modal-rodape {
+    display: flex;
+    justify-content: flex-end;
+    padding: 18px 28px 24px;
+    border-top: 1px solid #edf1f7;
+    background: #fff;
+}
+.auditoria-modal-rodape .auditoria-modal-fechar {
+    margin: 0 !important;
+    padding: 10px 22px !important;
+    border: 1px solid #2563eb !important;
+    border-radius: 8px !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background .2s ease, transform .2s ease;
+}
+.auditoria-modal-rodape .auditoria-modal-fechar:hover {
+    background: #1d4ed8 !important;
+    transform: translateY(-1px);
+}
+@media (max-width: 600px) {
+    .auditoria-modal-overlay { padding: 12px; }
+    .auditoria-modal-cabecalho { padding: 20px; }
+    .auditoria-modal-cabecalho h3 { font-size: 19px; }
+    .auditoria-modal-conteudo { padding: 14px 20px 6px; }
+    .auditoria-modal-conteudo > p { grid-template-columns: 1fr; gap: 4px; padding: 10px 0; }
+    .auditoria-modal-rodape { padding: 14px 20px 20px; }
+    .auditoria-modal-rodape .auditoria-modal-fechar { width: auto; min-width: 120px; }
+}

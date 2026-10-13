@@ -1,3 +1,5 @@
+import { FaExclamationTriangle, FaClock, FaCalendarAlt } from 'react-icons/fa';
+
 function formatarData(data) {
 
     if (!data) {
@@ -44,6 +46,7 @@ function ListaAlertas({
                     href={`/equipamentos/${item.equipamento_id}`}
                     className="dashboard-alerta-item"
                     key={item.id}
+                    aria-label={`${item.equipamento_codigo} — ${item.equipamento_nome}`}
                 >
 
                     <div className="dashboard-alerta-equipamento">
@@ -64,20 +67,14 @@ function ListaAlertas({
 
                     <div className="dashboard-alerta-data">
 
-                        <span>
-
+                        <span className="dashboard-alerta-data-valor">
+                            <FaCalendarAlt aria-hidden="true" />
                             {tipo === 'manutencao'
-
                                 ? formatarData(item.proxima_manutencao)
-
                                 : tipo === 'qualificacao'
-
                                     ? formatarData(item.proxima_qualificacao)
-
                                     : formatarData(item.data_validade)
-
                             }
-
                         </span>
 
                         <span className="dashboard-alerta-seta">
@@ -96,6 +93,20 @@ function ListaAlertas({
 
     );
 
+}
+
+function IconeAlerta({ vencido }) {
+    return vencido ? (
+        <FaExclamationTriangle
+            className="dashboard-alerta-icone dashboard-alerta-icone-vencida"
+            aria-hidden="true"
+        />
+    ) : (
+        <FaClock
+            className="dashboard-alerta-icone dashboard-alerta-icone-proxima"
+            aria-hidden="true"
+        />
+    );
 }
 
 function DashboardAlertas({
@@ -142,11 +153,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido />
+                            <span>Manutenções vencidas
 
-                            Manutenções vencidas
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 
@@ -173,11 +185,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido={false} />
+                            <span>Próximas manutenções
 
-                            Próximas manutenções
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 
@@ -204,11 +217,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido />
+                            <span>Qualificações vencidas
 
-                            Qualificações vencidas
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 
@@ -235,11 +249,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido={false} />
+                            <span>Próximas qualificações
 
-                            Próximas qualificações
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 
@@ -266,11 +281,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido />
+                            <span>Registros regulatórios vencidos
 
-                            Registros regulatórios vencidos
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 
@@ -297,11 +313,12 @@ function DashboardAlertas({
 
                     <div className="dashboard-alerta-titulo">
 
-                        <span>
+                        <div className="dashboard-alerta-titulo-texto">
+                            <IconeAlerta vencido={false} />
+                            <span>Próximos vencimentos regulatórios
 
-                            Próximos vencimentos regulatórios
-
-                        </span>
+                            </span>
+                        </div>
 
                         <strong>
 

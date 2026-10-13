@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 import api from '../services/api';
@@ -42,8 +43,21 @@ function criarFormularioVazio() {
     };
 }
 
+function obterClasseStatusOperacional(status) {
+    const valor = String(status || '').trim().toUpperCase();
+
+    if (valor === 'ATIVO') return 'status-operacional status-operacional-ativo';
+    if (valor === 'INATIVO') return 'status-operacional status-operacional-inativo';
+    if (valor === 'EM MANUTENÇÃO' || valor === 'EM MANUTENCAO') {
+        return 'status-operacional status-operacional-manutencao';
+    }
+
+    return 'status-operacional status-operacional-padrao';
+}
+
 function Operacional() {
     const { usuario } = useAuth();
+    const navigate = useNavigate();
 
     const [operacionais, setOperacionais] = useState([]);
     const [equipamentos, setEquipamentos] = useState([]);
@@ -164,6 +178,11 @@ function Operacional() {
                 .includes(termo)
         );
     });
+
+    const abrirDetalhesEquipamento = (equipamentoId) => {
+        if (!equipamentoId) return;
+        navigate(`/equipamentos/${equipamentoId}`);
+    };
 
     const alterarCampo = (campo, valor) => {
         setFormulario((estadoAtual) => ({
@@ -727,13 +746,32 @@ function Operacional() {
                                 operacionaisFiltrados.map(
                                     (operacional) => (
 
-                                        <tr key={operacional.id}>
+                                        <tr
+                                            key={operacional.id}
+                                            className="operacional-table-row"
+                                            onClick={() =>
+                                                abrirDetalhesEquipamento(operacional.equipamento_id)
+                                            }
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter' || event.key === ' ') {
+                                                    event.preventDefault();
+                                                    abrirDetalhesEquipamento(operacional.equipamento_id);
+                                                }
+                                            }}
+                                            tabIndex={operacional.equipamento_id ? 0 : -1}
+                                            role={operacional.equipamento_id ? 'link' : undefined}
+                                            aria-label={
+                                                operacional.equipamento_id
+                                                    ? `Ver detalhes de ${operacional.equipamento_codigo || ''} ${operacional.equipamento_nome || ''}`
+                                                    : undefined
+                                            }
+                                        >
 
-                                            <td>
+                                            <td className="operacional-identificador">
                                                 {operacional.equipamento_codigo || '-'}
                                             </td>
 
-                                            <td>
+                                            <td className="operacional-identificador">
                                                 {operacional.equipamento_nome || '-'}
                                             </td>
 
@@ -764,18 +802,19 @@ function Operacional() {
                                             </td>
 
                                             <td>
-                                                {operacional.status_operacional || '-'}
+                                                <span className={obterClasseStatusOperacional(operacional.status_operacional)}>
+                                                    {operacional.status_operacional || '-'}
+                                                </span>
                                             </td>
 
                                             {podeEditar && (
                                                 <td>
                                                     <button
                                                         type="button"
-                                                        onClick={() =>
-                                                            abrirFormularioEdicao(
-                                                                operacional
-                                                            )
-                                                        }
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            abrirFormularioEdicao(operacional);
+                                                        }}
                                                     >
                                                         Editar
                                                     </button>

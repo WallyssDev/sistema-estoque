@@ -164,38 +164,73 @@ const formatarDataHora = (valor) => {
 
 };
 
-const formatarValorAuditoria = (campo, valor) => {
-
-    if (
-        valor === null ||
-        valor === undefined ||
-        valor === ''
-    ) {
-
+const formatarValorAuditoria = (campo, valor, entidade = '') => {
+    if (valor === null || valor === undefined || valor === '') {
         return '-';
-
     }
 
-    if (typeof valor === 'boolean') {
+    // Valores legíveis para eventos técnicos registrados na auditoria.
+    const valoresConhecidos = {
+        SENHA_NAO_EXIBIDA: 'Senha não exibida',
+        SENHA_ALTERADA: 'Senha alterada',
+        APROVADO_COM_RESTRICAO: 'Aprovado com restrição',
+        APROVADO: 'Aprovado',
+        REPROVADO: 'Reprovado',
+        VIGENTE: 'Vigente',
+        VENCIDO: 'Vencido',
+        ATIVO: 'Ativo',
+        INATIVO: 'Inativo',
+        PREVENTIVA: 'Preventiva',
+        CORRETIVA: 'Corretiva',
+        OPERACAO: 'Operação',
+        INSTALACAO: 'Instalação',
+        DESEMPENHO: 'Desempenho',
+    };
 
-        return valor ? 'Sim' : 'Não';
+    // Booleanos podem chegar como boolean real ou como texto vindo do banco.
+    const valorTexto = typeof valor === 'string'
+        ? valor.trim()
+        : valor;
+    const valorNormalizado = typeof valorTexto === 'string'
+        ? valorTexto.toLowerCase()
+        : valorTexto;
+    const ehVerdadeiro = valorNormalizado === true || valorNormalizado === 'true';
+    const ehFalso = valorNormalizado === false || valorNormalizado === 'false';
 
+    if (campo === 'ativo' && (entidade === 'USUARIO' || entidade === 'EQUIPAMENTO')) {
+        if (ehVerdadeiro) return 'Ativo';
+        if (ehFalso) return 'Inativo';
+    }
+
+    if (typeof valor === 'boolean' || ehVerdadeiro || ehFalso) {
+        return ehVerdadeiro ? 'Sim' : 'Não';
     }
 
     if (CAMPOS_DATA.has(campo)) {
-
         return formatarData(valor);
-
     }
 
     if (typeof valor === 'object') {
-
         return JSON.stringify(valor);
-
     }
 
-    return String(valor);
+    const texto = String(valor).trim();
+    const chave = texto.toUpperCase();
 
+    if (valoresConhecidos[chave]) {
+        return valoresConhecidos[chave];
+    }
+
+    // Traduz enumerações técnicas em maiúsculas com _ ou -, sem mexer em códigos
+    // mistos como MS-123456789 ou identificadores de equipamento.
+    if (/^[A-ZÀ-Ü0-9]+(?:[_-][A-ZÀ-Ü0-9]+)+$/.test(texto)) {
+        const amigavel = texto
+            .replace(/[_-]+/g, ' ')
+            .toLocaleLowerCase('pt-BR');
+        return amigavel.charAt(0).toLocaleUpperCase('pt-BR') + amigavel.slice(1);
+    }
+
+    return texto;
 };
 
 const formatarResumo = (registro, valor) => {
@@ -214,7 +249,8 @@ const formatarResumo = (registro, valor) => {
 
     return formatarValorAuditoria(
         registro.campo,
-        valor
+        valor,
+        registro.entidade
     );
 
 };
@@ -267,6 +303,12 @@ function Auditoria() {
             !Array.isArray(dadosInterpretados)
             ? dadosInterpretados
             : null;
+
+
+    const intervaloDatasInvalido =
+        filtros.data_inicio &&
+        filtros.data_fim &&
+        filtros.data_inicio > filtros.data_fim;
 
 
     /*
@@ -780,10 +822,6 @@ function Auditoria() {
     };
 
 
-    const intervaloDatasInvalido =
-        filtros.data_inicio &&
-        filtros.data_fim &&
-        filtros.data_inicio > filtros.data_fim;
 
 
 
@@ -1342,20 +1380,31 @@ function Auditoria() {
 
             {registroSelecionado && (
 
-                <div className="modal-overlay">
+                <div className="modal-overlay auditoria-modal-overlay">
 
                     <div
-                        className="modal"
+                        className="modal auditoria-modal"
                         role="dialog"
                         aria-modal="true"
                         aria-label="Detalhes da auditoria"
                     >
 
-                        <h3>
-
-                            Detalhes da auditoria
-
-                        </h3>
+                        <div className="auditoria-modal-cabecalho">
+                            <div>
+                                <span className="auditoria-modal-sobretitulo">NEXORA · HISTÓRICO</span>
+                                <h3>Detalhes da auditoria</h3>
+                                <p>Informações do registro selecionado.</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="auditoria-modal-fechar-topo"
+                                onClick={() => setRegistroSelecionado(null)}
+                                aria-label="Fechar detalhes"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="auditoria-modal-conteudo">
 
                         <p>
 
@@ -1435,7 +1484,8 @@ function Auditoria() {
 
                                 : formatarValorAuditoria(
                                     registroSelecionado.campo,
-                                    registroSelecionado.valor_anterior
+                                    registroSelecionado.valor_anterior,
+                                    registroSelecionado.entidade
                                 )}
 
                         </p>
@@ -1454,7 +1504,8 @@ function Auditoria() {
 
                                 : formatarValorAuditoria(
                                     registroSelecionado.campo,
-                                    registroSelecionado.valor_novo
+                                    registroSelecionado.valor_novo,
+                                    registroSelecionado.entidade
                                 )}
 
                         </p>
@@ -1546,7 +1597,11 @@ function Auditoria() {
                             )}
 
 
+                        </div>
+
+                        <div className="auditoria-modal-rodape">
                         <button
+                            className="auditoria-modal-fechar"
                             type="button"
                             onClick={() =>
                                 setRegistroSelecionado(
@@ -1558,6 +1613,7 @@ function Auditoria() {
                             Fechar
 
                         </button>
+                        </div>
 
                     </div>
 

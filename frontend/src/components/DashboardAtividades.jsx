@@ -91,7 +91,6 @@ function DashboardAtividades({
             <div className="section-header">
 
                 <div>
-
                     <h3>
 
                         Atividades recentes
@@ -135,6 +134,7 @@ function DashboardAtividades({
                             key={atividade.id}
                             href={obterRotaAtividade(atividade)}
                             className="dashboard-atividade-item"
+                            title="Consultar registro no histórico"
                         >
 
                             <div className="dashboard-atividade-indicador">

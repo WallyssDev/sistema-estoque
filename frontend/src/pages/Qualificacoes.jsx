@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import api from '../services/api';
 
@@ -8,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 function Qualificacoes() {
     const { usuario } = useAuth();
+    const navigate = useNavigate();
 
     const [qualificacoes, setQualificacoes] = useState([]);
     const [carregando, setCarregando] = useState(true);
@@ -79,6 +81,53 @@ function Qualificacoes() {
         }
 
         return new Date(data).toLocaleDateString('pt-BR');
+    };
+
+    const abrirEquipamento = (qualificacao) => {
+        if (!qualificacao?.equipamento_id) return;
+        navigate(`/equipamentos/${qualificacao.equipamento_id}`);
+    };
+
+    const formatarResultado = (resultado) => {
+        const resultadoNormalizado = String(resultado || '').toUpperCase();
+
+        if (resultadoNormalizado === 'APROVADO') {
+            return { texto: 'Aprovado', classe: 'qualificacao-resultado-aprovado' };
+        }
+        if (resultadoNormalizado === 'APROVADO_COM_RESTRICAO') {
+            return { texto: 'Aprovado com restrição', classe: 'qualificacao-resultado-restricao' };
+        }
+        if (resultadoNormalizado === 'REPROVADO') {
+            return { texto: 'Reprovado', classe: 'qualificacao-resultado-reprovado' };
+        }
+        return { texto: resultado || '-', classe: 'qualificacao-resultado-padrao' };
+    };
+
+    const formatarTipo = (tipo) => {
+        const tipos = {
+            INSTALACAO: 'Instalação',
+            OPERACAO: 'Operação',
+            DESEMPENHO: 'Desempenho',
+            REQUALIFICACAO: 'Requalificação',
+            OUTRA: 'Outra'
+        };
+        return tipos[String(tipo || '').toUpperCase()] || tipo || '-';
+    };
+
+    const classeProximaQualificacao = (data) => {
+        if (!data) return 'qualificacao-proxima-sem-data';
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const proxima = new Date(data);
+        proxima.setHours(0, 0, 0, 0);
+
+        if (Number.isNaN(proxima.getTime())) return 'qualificacao-proxima-sem-data';
+        if (proxima < hoje) return 'qualificacao-proxima-vencida';
+
+        const dias = Math.ceil((proxima - hoje) / (1000 * 60 * 60 * 24));
+        if (dias <= 30) return 'qualificacao-proxima-breve';
+        return 'qualificacao-proxima-normal';
     };
 
     const iniciarEdicao = (qualificacao) => {
@@ -493,43 +542,72 @@ function Qualificacoes() {
                             </thead>
 
                             <tbody>
-                                {qualificacoes.map((qualificacao) => (
-                                    <tr key={qualificacao.id}>
-                                        <td>
-                                            {qualificacao.equipamento_codigo} -{' '}
-                                            {qualificacao.equipamento_nome}
-                                        </td>
+                                {qualificacoes.map((qualificacao) => {
+                                    const resultado = formatarResultado(qualificacao.resultado);
+                                    const podeEditar = usuario?.perfil === 'ADMIN' || usuario?.perfil === 'EDITOR';
 
-                                        <td>{qualificacao.tipo}</td>
+                                    return (
+                                        <tr
+                                            key={qualificacao.id}
+                                            className={qualificacao.equipamento_id ? 'qualificacao-linha-clicavel' : ''}
+                                            onClick={() => abrirEquipamento(qualificacao)}
+                                            onKeyDown={(event) => {
+                                                if (qualificacao.equipamento_id && (event.key === 'Enter' || event.key === ' ')) {
+                                                    event.preventDefault();
+                                                    abrirEquipamento(qualificacao);
+                                                }
+                                            }}
+                                            tabIndex={qualificacao.equipamento_id ? 0 : undefined}
+                                            title={qualificacao.equipamento_id ? 'Abrir detalhes do equipamento' : undefined}
+                                        >
+                                            <td className="qualificacao-equipamento">
+                                                <span className="qualificacao-equipamento-codigo">
+                                                    {qualificacao.equipamento_codigo || '-'}
+                                                </span>
+                                                <span className="qualificacao-equipamento-nome">
+                                                    {qualificacao.equipamento_nome || 'Equipamento'}
+                                                </span>
+                                            </td>
 
-                                        <td>
-                                            {formatarData(
-                                                qualificacao.data_qualificacao
-                                            )}
-                                        </td>
+                                            <td>
+                                                <span className="qualificacao-tipo-badge">
+                                                    {formatarTipo(qualificacao.tipo)}
+                                                </span>
+                                            </td>
 
-                                        <td>{qualificacao.responsavel}</td>
+                                            <td>{formatarData(qualificacao.data_qualificacao)}</td>
 
-                                        <td>{qualificacao.resultado}</td>
+                                            <td>{qualificacao.responsavel || '-'}</td>
 
-                                        <td>
-                                            {formatarData(
-                                                qualificacao.proxima_qualificacao
-                                            )}
-                                        </td>
+                                            <td>
+                                                <span className={`qualificacao-resultado-badge ${resultado.classe}`}>
+                                                    {resultado.texto}
+                                                </span>
+                                            </td>
 
-                                        <td>
-                                            {(usuario?.perfil === 'ADMIN' || usuario?.perfil === 'EDITOR') && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => iniciarEdicao(qualificacao)}
-                                                >
-                                                    Editar
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
+                                            <td>
+                                                <span className={`qualificacao-proxima ${classeProximaQualificacao(qualificacao.proxima_qualificacao)}`}>
+                                                    {formatarData(qualificacao.proxima_qualificacao)}
+                                                </span>
+                                            </td>
+
+                                            <td className="qualificacao-acoes">
+                                                {podeEditar && (
+                                                    <button
+                                                        type="button"
+                                                        className="qualificacao-editar-button"
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            iniciarEdicao(qualificacao);
+                                                        }}
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

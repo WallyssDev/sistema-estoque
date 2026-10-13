@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import '../styles/regulatorio.css';
@@ -25,6 +26,39 @@ const formatarData = (data) => {
     });
 };
 
+const obterClasseSituacao = (situacao) => {
+    const valor = String(situacao || '').trim().toUpperCase();
+
+    if (valor === 'VIGENTE') return 'regulatorio-status-vigente';
+    if (valor === 'VENCIDO') return 'regulatorio-status-vencido';
+    if (valor === 'PENDENTE') return 'regulatorio-status-pendente';
+    if (valor === 'ISENTO') return 'regulatorio-status-isento';
+
+    return 'regulatorio-status-padrao';
+};
+
+const obterClasseValidade = (data) => {
+    if (!data) return 'regulatorio-validade-sem-data';
+
+    const dataTexto = String(data).slice(0, 10);
+    const dataValidade = new Date(`${dataTexto}T00:00:00`);
+    if (Number.isNaN(dataValidade.getTime())) {
+        return 'regulatorio-validade-sem-data';
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const diasRestantes = Math.ceil(
+        (dataValidade.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasRestantes < 0) return 'regulatorio-validade-vencida';
+    if (diasRestantes <= 30) return 'regulatorio-validade-proxima';
+
+    return 'regulatorio-validade-normal';
+};
+
 const formatarDataParaInput = (data) => {
     if (!data) {
         return '';
@@ -41,6 +75,13 @@ const formatarDataParaInput = (data) => {
 
 function Regulatorio() {
     const { usuario } = useAuth();
+    const navigate = useNavigate();
+
+    const abrirEquipamento = (regulatorio) => {
+        if (regulatorio?.equipamento_id) {
+            navigate(`/equipamentos/${regulatorio.equipamento_id}`);
+        }
+    };
 
     const [regulatorios, setRegulatorios] = useState([]);
     const [equipamentos, setEquipamentos] = useState([]);
@@ -597,14 +638,36 @@ function Regulatorio() {
                             ) : (
                                 regulatoriosFiltrados.map(
                                     (regulatorio) => (
-                                        <tr key={regulatorio.id}>
-
+                                        <tr
+                                            key={regulatorio.id}
+                                            className={
+                                                regulatorio.equipamento_id
+                                                    ? 'regulatorio-linha-clicavel'
+                                                    : ''
+                                            }
+                                            onClick={() => abrirEquipamento(regulatorio)}
+                                            onKeyDown={(event) => {
+                                                if (
+                                                    regulatorio.equipamento_id &&
+                                                    (event.key === 'Enter' || event.key === ' ')
+                                                ) {
+                                                    event.preventDefault();
+                                                    abrirEquipamento(regulatorio);
+                                                }
+                                            }}
+                                            tabIndex={regulatorio.equipamento_id ? 0 : undefined}
+                                            aria-label={
+                                                regulatorio.equipamento_id
+                                                    ? `Abrir equipamento ${regulatorio.equipamento_codigo || ''} ${regulatorio.equipamento_nome || ''}`
+                                                    : undefined
+                                            }
+                                        >
                                             <td>
-                                                {regulatorio.equipamento_codigo}
+                                                {regulatorio.equipamento_codigo || '-'}
                                             </td>
 
                                             <td>
-                                                {regulatorio.equipamento_nome}
+                                                {regulatorio.equipamento_nome || '-'}
                                             </td>
 
                                             <td>
@@ -612,19 +675,23 @@ function Regulatorio() {
                                             </td>
 
                                             <td>
-                                                {regulatorio.situacao_regulatoria || '-'}
+                                                <span
+                                                    className={`regulatorio-status ${obterClasseSituacao(regulatorio.situacao_regulatoria)}`}
+                                                >
+                                                    {regulatorio.situacao_regulatoria || '-'}
+                                                </span>
                                             </td>
 
                                             <td>
-                                                {formatarData(
-                                                    regulatorio.data_registro
-                                                )}
+                                                {formatarData(regulatorio.data_registro)}
                                             </td>
 
                                             <td>
-                                                {formatarData(
-                                                    regulatorio.data_validade
-                                                )}
+                                                <span
+                                                    className={`regulatorio-validade ${obterClasseValidade(regulatorio.data_validade)}`}
+                                                >
+                                                    {formatarData(regulatorio.data_validade)}
+                                                </span>
                                             </td>
 
                                             <td>
@@ -644,17 +711,15 @@ function Regulatorio() {
                                                     <button
                                                         type="button"
                                                         className="regulatorio-botao-editar"
-                                                        onClick={() =>
-                                                            editarRegulatorio(
-                                                                regulatorio
-                                                            )
-                                                        }
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            editarRegulatorio(regulatorio);
+                                                        }}
                                                     >
                                                         Editar
                                                     </button>
                                                 </td>
                                             )}
-
                                         </tr>
                                     )
                                 )

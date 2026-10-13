@@ -450,3 +450,120 @@
         font-size: 12px;
     }
 }
+
+/* =========================================================
+   ACABAMENTO NEXORA — TABELA OPERACIONAL
+   ========================================================= */
+
+.operacional-table-container {
+    border-color: #dfe5ef;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 35, 70, 0.035);
+}
+
+.operacional-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.operacional-table th {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    background: #f7f9fc;
+    color: #42526b;
+    font-weight: 600;
+}
+
+.operacional-table td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    color: #183153;
+    transition: background-color 0.15s ease;
+}
+
+.operacional-table tbody tr.operacional-table-row {
+    cursor: pointer;
+    outline: none;
+}
+
+.operacional-table tbody tr.operacional-table-row:hover td {
+    background: #f3f7ff;
+}
+
+.operacional-table tbody tr.operacional-table-row:focus-visible td {
+    background: #edf4ff;
+    box-shadow: inset 0 2px 0 #93b4ff, inset 0 -2px 0 #93b4ff;
+}
+
+.operacional-identificador {
+    color: #183153;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.operacional-table tbody tr.operacional-table-row:hover .operacional-identificador {
+    color: #183153;
+    text-decoration: none;
+}
+
+.status-operacional {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 25px;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.status-operacional-ativo {
+    color: #087443;
+    background: #dcfce8;
+    border-color: #bbf7d0;
+}
+
+.status-operacional-inativo {
+    color: #b42318;
+    background: #fee4e2;
+    border-color: #fecdca;
+}
+
+.status-operacional-manutencao {
+    color: #9a5700;
+    background: #fff2cc;
+    border-color: #ffe08a;
+}
+
+.status-operacional-padrao {
+    color: #475467;
+    background: #eef2f6;
+    border-color: #dfe5ec;
+}
+
+.operacional-table td button {
+    position: relative;
+    z-index: 1;
+    border-color: #c6d8ff;
+    border-radius: 7px;
+    background: #f8fbff;
+    color: #245be8;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.operacional-table td button:hover {
+    border-color: #245be8;
+    background: #245be8;
+    color: #ffffff;
+}
+
+@media (max-width: 767px) {
+    .operacional-table th,
+    .operacional-table td {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}

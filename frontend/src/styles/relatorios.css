@@ -550,3 +550,335 @@
         font-size: 20px;
     }
 }
+/* =========================================================
+   NEXORA — refinamento visual dos relatórios
+   Mantém a lógica e as classes existentes.
+   ========================================================= */
+
+.relatorios-page {
+    max-width: 1800px;
+    color: #172746;
+}
+
+.relatorios-header {
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.relatorios-header h2 {
+    color: #10234a;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+.relatorios-header p {
+    color: #647895;
+    line-height: 1.55;
+}
+
+.relatorio-card {
+    border: 1px solid #dfe6f0;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(15, 39, 83, 0.035);
+    background: #fff;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.relatorio-card:hover {
+    border-color: #d3deed;
+    box-shadow: 0 4px 14px rgba(15, 39, 83, 0.055);
+}
+
+.relatorio-painel-cabecalho {
+    padding: 19px 22px;
+}
+
+.relatorio-painel-cabecalho:hover {
+    background: #f8fbff;
+}
+
+.relatorio-painel-titulo h3,
+.relatorio-resultado-header h3 {
+    color: #142747;
+    font-size: 17px;
+    font-weight: 750;
+    letter-spacing: -0.015em;
+}
+
+.relatorio-painel-titulo p,
+.relatorio-resultado-header p {
+    color: #667995;
+    line-height: 1.5;
+}
+
+.relatorio-painel-icone {
+    width: 35px;
+    height: 35px;
+    border-color: #dce5f1;
+    border-radius: 9px;
+    background: #fff;
+    color: #29466f;
+}
+
+.relatorio-painel-conteudo {
+    border-top-color: #e3eaf4;
+}
+
+.relatorio-filtros {
+    padding: 22px;
+    column-gap: 18px;
+    row-gap: 16px;
+}
+
+.campo-relatorio {
+    min-width: 0;
+    gap: 7px;
+}
+
+.campo-relatorio label {
+    color: #263b5b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.campo-relatorio input,
+.campo-relatorio select {
+    min-height: 41px;
+    border-color: #cfd9e7;
+    border-radius: 8px;
+    color: #172746;
+    font: inherit;
+    font-size: 13px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.campo-relatorio input:hover,
+.campo-relatorio select:hover {
+    border-color: #aebfd6;
+}
+
+.campo-relatorio input:focus,
+.campo-relatorio select:focus {
+    border-color: #3675ee;
+    box-shadow: 0 0 0 3px rgba(54, 117, 238, 0.13);
+}
+
+.campo-relatorio input::placeholder {
+    color: #93a2b8;
+}
+
+.relatorio-acoes {
+    gap: 10px;
+    padding-top: 5px;
+}
+
+.botao-relatorio {
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.botao-principal {
+    background: #2864e8;
+    border-color: #2864e8;
+    box-shadow: 0 2px 5px rgba(40, 100, 232, 0.14);
+}
+
+.botao-principal:hover:not(:disabled) {
+    background: #1f54ce;
+    border-color: #1f54ce;
+}
+
+.botao-secundario {
+    border-color: #d1dbea;
+    color: #29405f;
+}
+
+.botao-secundario:hover:not(:disabled) {
+    background: #f4f7fc;
+    border-color: #b9c9df;
+}
+
+.mensagem-relatorio {
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.relatorio-resultado-header {
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 20px 22px;
+    border-bottom-color: #e1e8f2;
+}
+
+.relatorio-resultado-header > div:first-child {
+    min-width: 150px;
+}
+
+.relatorios-exportacoes {
+    gap: 9px;
+}
+
+.relatorios-exportar-button {
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.relatorio-tabela-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #9aa9bd #edf2f8;
+}
+
+.relatorio-tabela-container::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+.relatorio-tabela-container::-webkit-scrollbar-track {
+    background: #edf2f8;
+    border-radius: 10px;
+}
+
+.relatorio-tabela-container::-webkit-scrollbar-thumb {
+    background: #9aa9bd;
+    border: 2px solid #edf2f8;
+    border-radius: 10px;
+}
+
+.relatorio-tabela-container::-webkit-scrollbar-thumb:hover {
+    background: #71839d;
+}
+
+.relatorio-tabela {
+    min-width: 1100px;
+    font-size: 12.5px;
+}
+
+.relatorio-tabela thead {
+    background: #f5f8fc;
+}
+
+.relatorio-tabela th {
+    padding: 13px 14px;
+    color: #29405f;
+    background: #f5f8fc;
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid #dfe7f1;
+}
+
+.relatorio-tabela td {
+    padding: 12px 14px;
+    color: #243a5b;
+    line-height: 1.45;
+    border-bottom: 1px solid #e9eef5;
+}
+
+.relatorio-tabela tbody tr:nth-child(even) {
+    background: #fbfcfe;
+}
+
+.relatorio-tabela tbody tr:hover {
+    background: #f1f6ff;
+}
+
+.relatorio-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.relatorio-vazio {
+    padding: 34px 22px;
+    color: #6b7d96;
+    line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+    .relatorio-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .relatorios-header {
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .relatorios-header h2 {
+        font-size: 23px;
+    }
+
+    .relatorio-card {
+        border-radius: 10px;
+        margin-bottom: 14px;
+    }
+
+    .relatorio-painel-cabecalho {
+        padding: 16px;
+    }
+
+    .relatorio-filtros {
+        padding: 16px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .relatorio-acoes {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .relatorio-acoes .botao-relatorio {
+        width: 100%;
+    }
+
+    .relatorio-resultado-header {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .relatorio-resultado-header > div:first-child {
+        width: 100%;
+    }
+
+    .relatorios-exportacoes {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .relatorios-exportar-button {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 0 10px;
+    }
+
+    .relatorio-tabela {
+        min-width: 1050px;
+    }
+
+    .relatorio-tabela th,
+    .relatorio-tabela td {
+        padding: 11px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .relatorios-exportacoes {
+        flex-direction: column;
+    }
+
+    .relatorios-exportar-button {
+        width: 100%;
+        flex: none;
+    }
+}

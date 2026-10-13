@@ -2,9 +2,47 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 import '../styles/manutencoes.css';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function Manutencoes() {
     const { usuario } = useAuth();
+    const navigate = useNavigate();
+
+    const abrirEquipamento = (manutencao) => {
+        const equipamentoId =
+            manutencao.equipamento_id ??
+            manutencao.equipamentoId ??
+            equipamentos.find(
+                (equipamento) =>
+                    equipamento.codigo === manutencao.equipamento_codigo
+            )?.id;
+
+        if (equipamentoId) {
+            navigate(`/equipamentos/${equipamentoId}`);
+        }
+    };
+
+    const obterClasseResultado = (resultado) => {
+        const valor = String(resultado || '').toUpperCase();
+
+        if (valor === 'APROVADO') return 'resultado-badge resultado-aprovado';
+        if (valor === 'APROVADO_COM_RESTRICAO') {
+            return 'resultado-badge resultado-restricao';
+        }
+        if (valor === 'REPROVADO') return 'resultado-badge resultado-reprovado';
+
+        return 'resultado-badge resultado-padrao';
+    };
+
+    const formatarResultado = (resultado) => {
+        const resultados = {
+            APROVADO: 'Aprovado',
+            APROVADO_COM_RESTRICAO: 'Aprovado com restrição',
+            REPROVADO: 'Reprovado',
+        };
+
+        return resultados[resultado] || resultado || '-';
+    };
 
     const [manutencoes, setManutencoes] = useState([]);
     const [carregando, setCarregando] = useState(true);
@@ -361,21 +399,85 @@ function Manutencoes() {
                         </thead>
 
                         <tbody>
-                            {manutencoes.map((manutencao) => (
-                                <tr key={manutencao.id}>
-                                    <td>{manutencao.equipamento_codigo}</td>
+                            {manutencoes.map((manutencao) => {
+                                const equipamentoId =
+                                    manutencao.equipamento_id ??
+                                    manutencao.equipamentoId ??
+                                    equipamentos.find(
+                                        (equipamento) =>
+                                            equipamento.codigo === manutencao.equipamento_codigo
+                                    )?.id;
 
-                                    <td>{manutencao.equipamento_nome}</td>
+                                return (
+                                    <tr
+                                        key={manutencao.id}
+                                        className={equipamentoId ? 'manutencao-linha-clicavel' : ''}
+                                        onClick={() => abrirEquipamento(manutencao)}
+                                        onKeyDown={(evento) => {
+                                            if (
+                                                equipamentoId &&
+                                                (evento.key === 'Enter' || evento.key === ' ')
+                                            ) {
+                                                evento.preventDefault();
+                                                abrirEquipamento(manutencao);
+                                            }
+                                        }}
+                                        tabIndex={equipamentoId ? 0 : undefined}
+                                        role={equipamentoId ? 'link' : undefined}
+                                        aria-label={
+                                            equipamentoId
+                                                ? `Abrir equipamento ${manutencao.equipamento_codigo} - ${manutencao.equipamento_nome}`
+                                                : undefined
+                                        }
+                                    >
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="manutencao-equipamento-link"
+                                                onClick={(evento) => {
+                                                    evento.stopPropagation();
+                                                    abrirEquipamento(manutencao);
+                                                }}
+                                                disabled={!equipamentoId}
+                                                title="Abrir detalhes do equipamento"
+                                            >
+                                                {manutencao.equipamento_codigo || '-'}
+                                            </button>
+                                        </td>
 
-                                    <td>{manutencao.tipo}</td>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="manutencao-equipamento-link"
+                                                onClick={(evento) => {
+                                                    evento.stopPropagation();
+                                                    abrirEquipamento(manutencao);
+                                                }}
+                                                disabled={!equipamentoId}
+                                                title="Abrir detalhes do equipamento"
+                                            >
+                                                {manutencao.equipamento_nome || '-'}
+                                            </button>
+                                        </td>
 
-                                    <td>{formatarData(manutencao.data_manutencao)}</td>
+                                        <td>
+                                            <span className="manutencao-tipo">
+                                                {manutencao.tipo || '-'}
+                                            </span>
+                                        </td>
 
-                                    <td>{manutencao.responsavel}</td>
+                                        <td>{formatarData(manutencao.data_manutencao)}</td>
 
-                                    <td>{manutencao.resultado}</td>
-                                </tr>
-                            ))}
+                                        <td>{manutencao.responsavel || '-'}</td>
+
+                                        <td>
+                                            <span className={obterClasseResultado(manutencao.resultado)}>
+                                                {formatarResultado(manutencao.resultado)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

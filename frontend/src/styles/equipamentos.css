@@ -557,3 +557,198 @@
     }
 
 }
+
+/* Mensagens no mesmo padrão da lista de usuários. */
+/* Mensagens de feedback seguindo o mesmo padrão visual da lista de usuários. */
+.equipamentos-mensagem {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.equipamentos-mensagem-sucesso {
+    background: #ecfdf3;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+}
+
+.equipamentos-mensagem-erro {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+/* Ações da tabela de equipamentos */
+.equipamentos-acoes-tabela {
+    white-space: nowrap;
+}
+
+.equipamentos-acoes-tabela button {
+    margin-right: 6px;
+}
+
+.botao-editar-equipamento,
+.botao-desativar-equipamento {
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.botao-editar-equipamento {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.botao-editar-equipamento:hover {
+    background: #dbeafe;
+}
+
+.botao-desativar-equipamento {
+    color: #b91c1c;
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+}
+
+.botao-desativar-equipamento:hover {
+    background: #fee2e2;
+}
+
+/* Modal centralizado no mesmo estilo da confirmação de usuários */
+.equipamentos-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.equipamentos-modal {
+    width: 100%;
+    max-width: 460px;
+    padding: 32px 28px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+    text-align: center;
+    animation: equipamentos-modal-aparecer 160ms ease-out;
+}
+
+.equipamentos-modal-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.equipamentos-modal-icone.sucesso {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.equipamentos-modal-icone.erro {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.equipamentos-modal h3 {
+    margin: 0 0 12px;
+    color: #1f2937;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.equipamentos-modal p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.equipamentos-modal p strong {
+    color: #374151;
+}
+
+.equipamentos-modal-acoes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.equipamentos-modal-acoes button {
+    min-width: 120px;
+    padding: 11px 18px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.equipamentos-modal-acoes button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.equipamentos-modal-cancelar {
+    color: #374151;
+    background: #f3f4f6;
+}
+
+.equipamentos-modal-cancelar:hover:not(:disabled) {
+    background: #e5e7eb;
+}
+
+.equipamentos-modal-confirmar {
+    color: #ffffff;
+    background: #2563eb;
+}
+
+.equipamentos-modal-confirmar:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.equipamentos-modal-confirmar.perigo {
+    background: #dc2626;
+}
+
+.equipamentos-modal-confirmar.perigo:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+@keyframes equipamentos-modal-aparecer {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+    .equipamentos-modal {
+        padding: 28px 20px;
+    }
+
+    .equipamentos-modal-acoes {
+        flex-direction: column-reverse;
+    }
+
+    .equipamentos-modal-acoes button {
+        width: 100%;
+    }
+}

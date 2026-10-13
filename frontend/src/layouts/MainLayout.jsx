@@ -1,21 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 function MainLayout({ children }) {
     const [menuAberto, setMenuAberto] = useState(false);
-
     const location = useLocation();
+    const estaNaTelaLogin = location.pathname === '/login';
 
-    const abrirFecharMenu = () => {
-        setMenuAberto((estadoAtual) => !estadoAtual);
-    };
-
-    const fecharMenu = () => {
-        setMenuAberto(false);
-    };
+    const abrirFecharMenu = () => setMenuAberto((estadoAtual) => !estadoAtual);
+    const fecharMenu = () => setMenuAberto(false);
 
     useEffect(() => {
         setMenuAberto(false);
@@ -23,29 +17,18 @@ function MainLayout({ children }) {
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth > 767) {
-                setMenuAberto(false);
-            }
+            if (window.innerWidth > 767) setMenuAberto(false);
         };
-
         window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener(
-                'resize',
-                handleResize
-            );
-        };
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // A tela pública de login não deve exibir a navegação do sistema autenticado.
+    if (estaNaTelaLogin) return children;
 
     return (
         <div className="app-layout">
-
-            <Sidebar
-                aberta={menuAberto}
-                onFechar={fecharMenu}
-            />
-
+            <Sidebar aberta={menuAberto} onFechar={fecharMenu} />
             {menuAberto && (
                 <button
                     type="button"
@@ -54,20 +37,10 @@ function MainLayout({ children }) {
                     aria-label="Fechar menu"
                 />
             )}
-
             <div className="main-area">
-
-                <Header
-                    onMenuToggle={abrirFecharMenu}
-                    menuAberto={menuAberto}
-                />
-
-                <main className="main-content">
-                    {children}
-                </main>
-
+                <Header onMenuToggle={abrirFecharMenu} menuAberto={menuAberto} />
+                <main className="main-content">{children}</main>
             </div>
-
         </div>
     );
 }

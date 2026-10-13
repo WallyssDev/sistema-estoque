@@ -1,558 +1,95 @@
-/* =========================================================
-   MANUTENÇÕES
-   ========================================================= */
+/* NEXORA — MANUTENÇÕES */
+.manutencoes-page { width:100%; min-width:0; color:#172b4d; }
+.manutencoes-page, .manutencoes-page * { box-sizing:border-box; }
 
-.manutencoes-page {
-    width: 100%;
-    min-width: 0;
+.manutencoes-title { margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.manutencoes-title h2 { margin:0 0 6px; color:#10284f; font-size:26px; font-weight:700; letter-spacing:-.035em; line-height:1.25; }
+.manutencoes-title p { margin:0; color:#64748b; font-size:14px; line-height:1.5; }
+.nova-manutencao-button { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; min-height:42px; padding:11px 17px; border:1px solid #2563eb; border-radius:9px; background:linear-gradient(135deg,#3274f6 0%,#1d4ed8 100%); box-shadow:0 3px 8px rgb(37 99 235 / 18%); color:#fff; font-size:13px; font-weight:650; cursor:pointer; transition:background-color .18s ease,box-shadow .18s ease,transform .18s ease; }
+.nova-manutencao-button:hover { background:#1d4ed8; box-shadow:0 5px 12px rgb(37 99 235 / 23%); transform:translateY(-1px); }
+.nova-manutencao-button:focus-visible,.botao-cancelar:focus-visible,.botao-cadastrar:focus-visible { outline:3px solid rgb(59 130 246 / 30%); outline-offset:2px; }
+
+.manutencoes-table-container { width:100%; background:#fff; border:1px solid #e1e7f0; border-radius:12px; box-shadow:0 2px 8px rgb(15 23 42 / 3%); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; }
+.manutencoes-table { width:100%; border-collapse:separate; border-spacing:0; color:#243b5a; }
+.manutencoes-table th { padding:15px 20px; background:#f7f9fc; border-bottom:1px solid #e1e7f0; color:#536782; font-size:12px; font-weight:700; letter-spacing:.015em; text-align:left; white-space:nowrap; }
+.manutencoes-table td { padding:16px 20px; border-bottom:1px solid #edf1f6; color:#263b59; font-size:13px; line-height:1.45; white-space:nowrap; }
+.manutencoes-table tbody tr { cursor:pointer; transition:background-color .15s ease; }
+.manutencoes-table tbody tr:hover { background:#f5f8ff; }
+.manutencoes-table tbody tr:focus-visible { outline:2px solid #3b82f6; outline-offset:-2px; }
+.manutencoes-table tbody tr:last-child td { border-bottom:none; }
+.manutencoes-table td:first-child { color:#183d78; font-weight:700; font-variant-numeric:tabular-nums; }
+
+/* Código e nome têm aparência de texto normal, sem sublinhado de link. */
+.manutencao-equipamento-link,
+.manutencao-equipamento-link:link,
+.manutencao-equipamento-link:visited,
+.manutencao-equipamento-link:hover,
+.manutencao-equipamento-link:active {
+  display:inline;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  color:inherit;
+  font:inherit;
+  font-weight:inherit;
+  text-align:left;
+  text-decoration:none;
+  cursor:pointer;
 }
+.manutencao-equipamento-link:hover { text-decoration:none; color:inherit; }
+.manutencao-equipamento-link:focus-visible { outline:2px solid #3b82f6; outline-offset:3px; border-radius:2px; }
+.manutencao-equipamento-link:disabled { color:inherit; opacity:1; cursor:default; }
 
-/* =========================================================
-   TÍTULO
-   ========================================================= */
+.manutencao-tipo { display:inline-flex; align-items:center; padding:6px 10px; border-radius:6px; background:#eff6ff; color:#1d4ed8; font-size:11px; font-weight:700; letter-spacing:.025em; }
+.resultado-badge { display:inline-flex; align-items:center; justify-content:center; padding:5px 10px; border:1px solid transparent; border-radius:7px; font-size:11px; font-weight:700; line-height:1.2; white-space:nowrap; }
+.resultado-aprovado { background:#dcfce7; border-color:#bbf7d0; color:#166534; }
+.resultado-restricao { background:#fef3c7; border-color:#fde68a; color:#92400e; }
+.resultado-reprovado { background:#fee2e2; border-color:#fecaca; color:#991b1b; }
+.resultado-padrao { background:#f1f5f9; border-color:#e2e8f0; color:#475569; }
 
-.manutencoes-title {
-    margin-bottom: 24px;
+.mensagem-sucesso,.mensagem-erro { display:flex; align-items:center; gap:11px; margin:0 0 20px; padding:13px 16px; border-radius:10px; font-size:13px; font-weight:600; line-height:1.45; }
+.mensagem-sucesso { background:#effcf4; border:1px solid #b9edcc; color:#166534; }
+.mensagem-erro { background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; }
+.mensagem-sucesso span,.mensagem-erro span { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; flex:0 0 22px; border-radius:50%; font-size:12px; font-weight:800; }
+.mensagem-sucesso span { background:#15803d; color:#fff; }
+.mensagem-erro span { background:#be123c; color:#fff; }
+.mensagem-sucesso p,.mensagem-erro p { margin:0; }
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.manutencoes-formulario { margin:0 0 26px; padding:26px; background:#fff; border:1px solid #e1e7f0; border-radius:14px; box-shadow:0 4px 16px rgb(15 23 42 / 4%); }
+.manutencoes-formulario h3 { margin:0 0 7px; color:#10284f; font-size:20px; font-weight:700; letter-spacing:-.02em; }
+.manutencoes-formulario > p { margin:0 0 24px; color:#64748b; font-size:13px; line-height:1.5; }
+.formulario-campo { display:flex; flex-direction:column; gap:7px; margin-bottom:17px; }
+.formulario-campo label { color:#344965; font-size:13px; font-weight:650; }
+.formulario-campo input,.formulario-campo select { width:100%; min-height:42px; padding:10px 12px; border:1px solid #d5deea; border-radius:8px; outline:none; background:#fff; color:#1e3352; font:inherit; font-size:13px; transition:border-color .18s ease,box-shadow .18s ease; }
+.formulario-campo input:hover,.formulario-campo select:hover { border-color:#aabbd2; }
+.formulario-campo input:focus,.formulario-campo select:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgb(59 130 246 / 14%); }
+.formulario-campo input::placeholder { color:#9aa9bc; }
+.formulario-acoes { display:flex; justify-content:flex-end; gap:10px; margin-top:25px; padding-top:20px; border-top:1px solid #e7edf5; }
+.botao-cancelar,.botao-cadastrar { display:inline-flex; align-items:center; justify-content:center; min-height:41px; padding:10px 17px; border-radius:8px; font-size:13px; font-weight:650; cursor:pointer; transition:background-color .18s ease,border-color .18s ease,transform .18s ease; }
+.botao-cancelar { border:1px solid #d5deea; background:#fff; color:#425673; }
+.botao-cancelar:hover { background:#f6f8fb; border-color:#b9c7d9; }
+.botao-cadastrar { border:1px solid #2563eb; background:#2563eb; color:#fff; }
+.botao-cadastrar:hover { background:#1d4ed8; }
+.botao-cancelar:disabled,.botao-cadastrar:disabled,.nova-manutencao-button:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+.manutencoes-page > p { color:#64748b; font-size:13px; line-height:1.5; }
+.manutencoes-page > p:only-child { padding:18px 0; }
 
-    gap: 20px;
+@media (max-width:1023px) { .manutencoes-title h2 { font-size:24px; } .manutencoes-table { min-width:850px; } }
+@media (max-width:767px) {
+  .manutencoes-title { flex-direction:column; align-items:stretch; gap:15px; margin-bottom:20px; }
+  .manutencoes-title h2 { font-size:22px; } .manutencoes-title p { font-size:13px; }
+  .nova-manutencao-button { width:100%; }
+  .mensagem-sucesso,.mensagem-erro { align-items:flex-start; padding:12px 13px; }
+  .manutencoes-formulario { padding:19px; margin-bottom:20px; border-radius:12px; }
+  .manutencoes-formulario h3 { font-size:18px; } .manutencoes-formulario > p { margin-bottom:20px; }
+  .manutencoes-formulario .formulario-campo,.manutencoes-formulario .formulario-campo input,.manutencoes-formulario .formulario-campo select { width:100%; max-width:100%; }
+  .manutencoes-formulario .formulario-acoes { flex-direction:column-reverse; align-items:stretch; gap:9px; }
+  .manutencoes-formulario .botao-cancelar,.manutencoes-formulario .botao-cadastrar { width:100%; }
+  .manutencoes-table-container { max-width:100%; }
+  .manutencoes-table { width:850px; min-width:850px; }
+  .manutencoes-table th { padding:13px 15px; font-size:11px; } .manutencoes-table td { padding:14px 15px; font-size:12px; }
 }
-
-.manutencoes-title h2 {
-    font-size: 24px;
-    margin-bottom: 6px;
-}
-
-.manutencoes-title p {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-/* =========================================================
-   TABELA
-   ========================================================= */
-
-.manutencoes-table-container {
-    width: 100%;
-
-    background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    -webkit-overflow-scrolling: touch;
-}
-
-.manutencoes-table {
-    width: 100%;
-
-    border-collapse: collapse;
-}
-
-.manutencoes-table th {
-    background: #f9fafb;
-
-    color: #6b7280;
-
-    font-size: 12px;
-    font-weight: 600;
-
-    text-align: left;
-
-    padding: 14px 20px;
-
-    border-bottom: 1px solid #e5e7eb;
-
-    white-space: nowrap;
-}
-
-.manutencoes-table td {
-    padding: 16px 20px;
-
-    font-size: 13px;
-
-    border-bottom: 1px solid #f3f4f6;
-
-    white-space: nowrap;
-}
-
-.manutencoes-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.manutencoes-table tbody tr:hover {
-    background: #f9fafb;
-}
-
-.manutencoes-table td:first-child {
-    font-weight: 600;
-    color: #111827;
-}
-
-/* =========================================================
-   BOTÃO NOVA MANUTENÇÃO
-   ========================================================= */
-
-.nova-manutencao-button {
-    border: none;
-
-    background: #2563eb;
-    color: #ffffff;
-
-    padding: 11px 16px;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    flex-shrink: 0;
-
-    transition: background-color 0.2s ease;
-}
-
-.nova-manutencao-button:hover {
-    background: #1d4ed8;
-}
-
-/* =========================================================
-   MENSAGENS
-   ========================================================= */
-
-.mensagem-sucesso,
-.mensagem-erro {
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 12px 16px;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    margin-bottom: 20px;
-}
-
-.mensagem-sucesso {
-    background: #dcfce7;
-
-    color: #166534;
-
-    border: 1px solid #bbf7d0;
-}
-
-.mensagem-erro {
-    background: #fee2e2;
-
-    color: #991b1b;
-
-    border: 1px solid #fecaca;
-}
-
-.mensagem-sucesso span,
-.mensagem-erro span {
-    width: 20px;
-    height: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    font-size: 12px;
-    font-weight: 700;
-
-    flex-shrink: 0;
-}
-
-.mensagem-sucesso span {
-    background: #166534;
-    color: #ffffff;
-}
-
-.mensagem-erro span {
-    background: #991b1b;
-    color: #ffffff;
-}
-
-.mensagem-sucesso p,
-.mensagem-erro p {
-    margin: 0;
-}
-
-/* =========================================================
-   FORMULÁRIO
-   ========================================================= */
-
-.manutencoes-formulario {
-    background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-
-    padding: 24px;
-
-    margin-bottom: 32px;
-}
-
-.manutencoes-formulario h3 {
-    font-size: 18px;
-
-    margin-bottom: 6px;
-}
-
-.manutencoes-formulario > p {
-    font-size: 13px;
-
-    color: #6b7280;
-
-    margin-bottom: 24px;
-}
-
-/* =========================================================
-   CAMPOS
-   ========================================================= */
-
-.formulario-campo {
-    display: flex;
-    flex-direction: column;
-
-    gap: 7px;
-
-    margin-bottom: 16px;
-}
-
-.formulario-campo label {
-    font-size: 13px;
-
-    font-weight: 600;
-
-    color: #374151;
-}
-
-.formulario-campo input,
-.formulario-campo select {
-    width: 100%;
-
-    padding: 11px 12px;
-
-    border: 1px solid #d1d5db;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-
-    outline: none;
-
-    background: #ffffff;
-
-    box-sizing: border-box;
-}
-
-.formulario-campo input:focus,
-.formulario-campo select:focus {
-    border-color: #2563eb;
-
-    box-shadow:
-        0 0 0 3px #dbeafe;
-}
-
-.formulario-campo input::placeholder {
-    color: #9ca3af;
-}
-
-/* =========================================================
-   AÇÕES DO FORMULÁRIO
-   ========================================================= */
-
-.formulario-acoes {
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 10px;
-
-    margin-top: 24px;
-
-    padding-top: 20px;
-
-    border-top: 1px solid #e5e7eb;
-}
-
-.botao-cancelar {
-    border: 1px solid #d1d5db;
-
-    background: #ffffff;
-
-    color: #374151;
-
-    padding: 11px 16px;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: background-color 0.2s ease;
-}
-
-.botao-cancelar:hover {
-    background: #f9fafb;
-}
-
-.botao-cadastrar {
-    border: none;
-
-    background: #2563eb;
-
-    color: #ffffff;
-
-    padding: 11px 16px;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: background-color 0.2s ease;
-}
-
-.botao-cadastrar:hover {
-    background: #1d4ed8;
-}
-
-/* =========================================================
-   TABLET
-   768px - 1023px
-   ========================================================= */
-
-@media (max-width: 1023px) {
-
-    .manutencoes-title {
-        gap: 16px;
-    }
-
-    .manutencoes-title h2 {
-        font-size: 22px;
-    }
-
-    .manutencoes-table-container {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .manutencoes-table {
-        min-width: 850px;
-    }
-
-}
-
-/* =========================================================
-   MOBILE
-   Até 767px
-   ========================================================= */
-
-@media (max-width: 767px) {
-
-    .manutencoes-page {
-        width: 100%;
-        min-width: 0;
-    }
-
-    /* -----------------------------------------
-       Título
-       ----------------------------------------- */
-
-    .manutencoes-title {
-        flex-direction: column;
-
-        align-items: stretch;
-
-        gap: 16px;
-
-        margin-bottom: 20px;
-    }
-
-    .manutencoes-title h2 {
-        font-size: 21px;
-
-        line-height: 1.25;
-
-        margin-bottom: 5px;
-    }
-
-    .manutencoes-title p {
-        font-size: 13px;
-
-        line-height: 1.4;
-    }
-
-    /* -----------------------------------------
-       Botão
-       ----------------------------------------- */
-
-    .nova-manutencao-button {
-        width: 100%;
-
-        padding: 12px 16px;
-
-        text-align: center;
-    }
-
-    /* -----------------------------------------
-       Mensagens
-       ----------------------------------------- */
-
-    .mensagem-sucesso,
-    .mensagem-erro {
-        width: 100%;
-
-        box-sizing: border-box;
-
-        align-items: flex-start;
-
-        padding: 12px 14px;
-
-        line-height: 1.4;
-    }
-
-    /* -----------------------------------------
-       Formulário
-       ----------------------------------------- */
-
-    .manutencoes-formulario {
-        width: 100%;
-
-        box-sizing: border-box;
-
-        padding: 18px;
-
-        margin-bottom: 20px;
-    }
-
-    .manutencoes-formulario h3 {
-        font-size: 17px;
-
-        line-height: 1.3;
-    }
-
-    .manutencoes-formulario > p {
-        font-size: 13px;
-
-        line-height: 1.5;
-
-        margin-bottom: 20px;
-    }
-
-    .manutencoes-formulario .formulario-campo {
-        width: 100%;
-    }
-
-    .manutencoes-formulario .formulario-campo input,
-    .manutencoes-formulario .formulario-campo select {
-        width: 100%;
-
-        max-width: 100%;
-
-        box-sizing: border-box;
-    }
-
-    /* -----------------------------------------
-       Botões do formulário
-       ----------------------------------------- */
-
-    .manutencoes-formulario .formulario-acoes {
-        flex-direction: column-reverse;
-
-        align-items: stretch;
-
-        gap: 10px;
-    }
-
-    .manutencoes-formulario .botao-cancelar,
-    .manutencoes-formulario .botao-cadastrar {
-        width: 100%;
-
-        box-sizing: border-box;
-
-        text-align: center;
-    }
-
-    /* -----------------------------------------
-       Tabela
-       ----------------------------------------- */
-
-    .manutencoes-table-container {
-        width: 100%;
-
-        max-width: 100%;
-
-        overflow-x: auto;
-
-        box-sizing: border-box;
-
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .manutencoes-table {
-        width: 850px;
-
-        min-width: 850px;
-    }
-
-    .manutencoes-table th {
-        padding: 13px 16px;
-
-        font-size: 11px;
-    }
-
-    .manutencoes-table td {
-        padding: 14px 16px;
-
-        font-size: 12px;
-    }
-
-}
-
-/* =========================================================
-   MOBILE PEQUENO
-   Até 374px
-   ========================================================= */
-
-@media (max-width: 374px) {
-
-    .manutencoes-title h2 {
-        font-size: 20px;
-    }
-
-    .manutencoes-formulario {
-        padding: 16px;
-    }
-
-    .manutencoes-formulario h3 {
-        font-size: 16px;
-    }
-
-    .manutencoes-table {
-        width: 820px;
-
-        min-width: 820px;
-    }
-
-}
+@media (max-width:374px) { .manutencoes-title h2 { font-size:21px; } .manutencoes-formulario { padding:15px; } .manutencoes-formulario h3 { font-size:17px; } .manutencoes-table { width:820px; min-width:820px; } }
